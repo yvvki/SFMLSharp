@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.Build.NoTargets/3.1.0">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>CSFML.Redist</Title>
+    <Description>A redistributable package for the C port of the Simple and Fast Multimedia Library.</Description>
+
+    <Version>2.5.1</Version>
+    <Company>SFML</Company>
+    <Authors>Laurent Gomila</Authors>
+    <PackageTags>sfml;csfml</PackageTags>
+    <Copyright>Copyright (c) Laurent Gomila</Copyright>
+
+    <PackageLicenseExpression>Zlib</PackageLicenseExpression>
+    <PackageProjectUrl>https://www.sfml-dev.org/</PackageProjectUrl>
+    <PackageIconUrl>https://www.sfml-dev.org/images/sfml-icon.png</PackageIconUrl>
+    <PackageIcon>sfml-icon.png</PackageIcon>
+
+    <RepositoryUrl>https://github.com/sfml/csfml</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="runtimes\**">
+      <Pack>true</Pack>
+      <PackagePath>\runtimes</PackagePath>
+    </Content>
+    <Content Include="sfml-icon.png">
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
+    </Content>
+  </ItemGroup>
+
+</Project>

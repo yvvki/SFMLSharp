@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+  <vector name="Constructs1">
+    <summary>
+      Construct a new vector from a value to fill the components.
+    </summary>
+    <param name="value">The value to fill the components.</param>
+  </vector>
+
+  <vector name="Constructs2">
+    <summary>
+      Construct a new vector from 2 components.
+    </summary>
+    <param name="x">The value for the X component.</param>
+    <param name="y">The value for the Y component.</param>
+  </vector>
+
+  <vector name="Constructs3">
+    <summary>
+      Construct a new vector from 3 components.
+    </summary>
+    <param name="x">The value for the X component.</param>
+    <param name="y">The value for the Y component.</param>
+    <param name="z">The value for the Z component.</param>
+  </vector>
+
+  <vector name="Constructs3From2">
+    <summary>
+      Construct a new vector from a 2-component value and another value.
+    </summary>
+    <param name="value">The value for the X and Y component.</param>
+    <param name="z">The value for the Z component.</param>
+  </vector>
+
+  <vector name="Constructs3With2">
+    <summary>
+      Construct a new vector from a value and another 2-component value.
+    </summary>
+    <param name="x">The value for the X component.</param>
+    <param name="value">The value for the Y and Z component.</param>
+  </vector>
+
+  <vector name="Negate">
+    <summary>
+      Additive inverses a vector.
+    </summary>
+    <param name="value">The specified value.</param>
+    <returns>The opposite vector.</returns>
+  </vector>
+
+  <vector name="Add">
+    <summary>
+      Adds two vectors together.
+    </summary>
+    <param name="left">The augend value.</param>
+    <param name="right">The addend value.</param>
+    <returns>The sum vector.</returns>
+  </vector>
+
+  <vector name="Subtract">
+    <summary>
+      Subtracts a vector with another vector.
+    </summary>
+    <param name="left">The minuend value.</param>
+    <param name="right">The subtrahend value.</param>
+    <returns>The difference vector.</returns>
+  </vector>
+
+  <vector name="Multiply">
+    <summary>
+      Multiplies two vectors together.
+    </summary>
+    <param name="left">The multiplicand value.</param>
+    <param name="right">The multiplier value.</param>
+    <returns>The product vector.</returns>
+  </vector>
+
+  <vector name="MultiplyValue">
+    <summary>
+      Multiplies a vector with another value.
+    </summary>
+    <param name="left">The multiplicand value.</param>
+    <param name="right">The multiplier value.</param>
+    <returns>The product vector.</returns>
+  </vector>
+
+  <vector name="Divide">
+    <summary>
+      Divides a vector with another vector.
+    </summary>
+    <param name="left">The dividend value.</param>
+    <param name="right">The divisor value.</param>
+    <returns>The quotient vector.</returns>
+  </vector>
+
+  <vector name="DivideValue">
+    <summary>
+      Divides a vector with another value.
+    </summary>
+    <param name="left">The dividend value.</param>
+    <param name="right">The divisor value.</param>
+    <returns>The quotient vector.</returns>
+  </vector>
+
+  <vector name="Modulo">
+    <summary>
+      Modulos a vector with another vector.
+    </summary>
+    <param name="left">The dividend value.</param>
+    <param name="right">The divisor value.</param>
+    <returns>The remainder vector.</returns>
+  </vector>
+</doc>

@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<doc>
+  <cursor name="Type">
+    <remarks>
+      Refer to the following table to determine which cursor is available on which platform:
+
+      <!-- This was used before -->
+
+      <!--
+        <code>
+          .Type.................. | Linux | Mac OS X | Windows <br/>
+          :______________________:|:_____:|:________:|:_______:<br/>
+          .Arrow................. | .yes. | ...yes.. | ..yes.. <br/>
+          .ArrowWait............. | .no.. | ...no... | ..yes.. <br/>
+          .Wait.................. | .yes. | ...no... | ..yes.. <br/>
+          .Text.................. | .yes. | ...yes.. | ..yes.. <br/>
+          .Hand.................. | .yes. | ...yes.. | ..yes.. <br/>
+          .SizeHorizontal........ | .yes. | ...yes.. | ..yes.. <br/>
+          .SizeVertical.......... | .yes. | ...yes.. | ..yes.. <br/>
+          .SizeTopLeftBottomRight | .no.. | ...no... | ..yes.. <br/>
+          .SizeBottomLeftTopRight | .no.. | ...no... | ..yes.. <br/>
+          .SizeAll............... | .yes. | ...no... | ..yes.. <br/>
+          .Cross................. | .yes. | ...yes.. | ..yes.. <br/>
+          .Help.................. | .yes. | ...no... | ..yes.. <br/>
+          .NotAllowed............ | .yes. | ...yes.. | ..yes.. <br/>
+        </code>
+      -->
+
+      <!-- Replaced with a proper list table -->
+
+      <list type="table">
+        <listheader>
+          <term>Type</term>
+          <term>Linux</term>
+          <term>Mac OS X</term>
+          <term>Windows</term>
+        </listheader>
+        <item>
+          <term>
+            <see cref="Arrow" />
+          </term>
+          <term>yes</term>
+          <term>yes</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="ArrowWait" />
+          </term>
+          <term>no</term>
+          <term>no</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="Wait" />
+          </term>
+          <term>yes</term>
+          <term>no</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="Text" />
+          </term>
+          <term>yes</term>
+          <term>yes</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="Hand" />
+          </term>
+          <term>yes</term>
+          <term>yes</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="SizeHorizontal" />
+          </term>
+          <term>yes</term>
+          <term>yes</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="SizeVertical" />
+          </term>
+          <term>yes</term>
+          <term>yes</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="SizeTopLeftBottomRight" />
+          </term>
+          <term>no</term>
+          <term>yes*</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="SizeBottomLeftTopRight" />
+          </term>
+          <term>no</term>
+          <term>yes*</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="SizeAll" />
+          </term>
+          <term>yes</term>
+          <term>no</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="Cross" />
+          </term>
+          <term>yes</term>
+          <term>yes</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="Help" />
+          </term>
+          <term>yes</term>
+          <term>yes*</term>
+          <term>yes</term>
+        </item>
+        <item>
+          <term>
+            <see cref="NotAllowed" />
+          </term>
+          <term>yes</term>
+          <term>yes</term>
+          <term>yes</term>
+        </item>
+      </list>
+
+      * These cursor types are undocumented so may not be available on all versions, but have been tested on 10.13.
+    </remarks>
+  </cursor>
+</doc>

@@ -1,0 +1,306 @@
+﻿<#@ template language="C#" hostspecific="true" debug="true" #>
+<#@ assembly name="System.Core" #>
+<#
+(string name, string type, string vector, bool unsigned)[] rect = new (string, string, string, bool)[]
+{
+	("FloatRect", "float", "Vector2F", false),
+	("IntRect", "int", "Vector2I", false)
+};
+#>
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
+using System.Runtime.Versioning;
+
+using SFML.System;
+
+namespace SFML.Graphics
+{
+<#
+foreach ((string name, string type, string vector, bool unsigned) in rect)
+{
+#>
+	public struct <#= name #> :
+		IRect<<#= name #>, <#= type #>>,
+		IReadOnlyRect<<#= type #>>,
+		IEquatable<<#= name #>>,
+		IFormattable
+	{
+		#region Fields & Properties
+
+		public <#= type #> Left;
+		public <#= type #> Top;
+		public <#= type #> Width;
+		public <#= type #> Height;
+
+		<#= type #> IRect<<#= name #>, <#= type #>>.Left { get => Left; set => Left = value; }
+		<#= type #> IRect<<#= name #>, <#= type #>>.Top { get => Top; set => Top = value; }
+		<#= type #> IRect<<#= name #>, <#= type #>>.Width { get => Width; set => Width = value; }
+		<#= type #> IRect<<#= name #>, <#= type #>>.Height { get => Height; set => Height = value; }
+
+		<#= type #> IReadOnlyRect<<#= type #>>.Left => Left;
+		<#= type #> IReadOnlyRect<<#= type #>>.Top => Top;
+		<#= type #> IReadOnlyRect<<#= type #>>.Width => Width;
+		<#= type #> IReadOnlyRect<<#= type #>>.Height => Height;
+
+		public <#= vector #> Position
+		{
+			get => new(Left, Top);
+			set
+			{
+				Left = value.X;
+				Top = value.Y;
+			}
+		}
+		public <#= vector #> Size
+		{
+			get => new(Width, Height);
+			set
+			{
+				Width = value.X;
+				Height = value.Y;
+			}
+		}
+
+		IReadOnlyVector2<<#= type #>> IRect<<#= name #>, <#= type #>>.Position
+		{
+			get => Position;
+			set => Position = new(value);
+		}
+		IReadOnlyVector2<<#= type #>> IRect<<#= name #>, <#= type #>>.Size
+		{
+			get => Size;
+			set => Size = new(value);
+		}
+
+		IReadOnlyVector2<<#= type #>> IReadOnlyRect<<#= type #>>.Position => Position;
+		IReadOnlyVector2<<#= type #>> IReadOnlyRect<<#= type #>>.Size => Size;
+
+		#endregion
+
+		#region Constructors
+
+		public <#= name #>(IReadOnlyRect<<#= type #>> value) : this(value.Left, value.Top, value.Width, value.Height) { }
+
+		public <#= name #>(IReadOnlyVector2<<#= type #>> position, IReadOnlyVector2<<#= type #>> size)
+			: this(position.X, position.Y, size.X, size.Y) { }
+
+		public <#= name #>(<#= type #> left, <#= type #> top, <#= type #> width, <#= type #> height)
+		{
+			Left = left;
+			Top = top;
+			Width = width;
+			Height = height;
+		}
+
+		#endregion
+
+		#region Interface Methods Implementations
+
+		public <#= name #> GetNormalized()
+		{
+			if (Size == default) return this;
+
+			<#= type #> left;
+			<#= type #> top;
+			<#= type #> width;
+			<#= type #> height;
+
+			if (Width < 0)
+			{
+				left = Left - Width;
+				width = -Width;
+			}
+			else
+			{
+				left = Left;
+				width = Width;
+			}
+
+			if (Height < 0)
+			{
+				top = Top - Height;
+				height = -Height;
+			}
+			else
+			{
+				top = Top;
+				height = Height;
+			}
+
+			return new(left, top, width, height);
+		}
+
+		public bool Contains(<#= type #> x, <#= type #> y)
+		{
+			<#= name #> r = GetNormalized();
+
+			return (r.Left <= x) && (x < r.Left + r.Width)
+				&& (r.Top <= y) && (y < r.Top + r.Height);
+		}
+
+		public bool Contains(IReadOnlyVector2<<#= type #>> point)
+		{
+			return Contains(point.X, point.Y);
+		}
+
+		public bool Intersects(<#= name #> rectangle, out <#= name #> intersection)
+		{
+			<#= name #> r1 = GetNormalized();
+			<#= name #> r2 = rectangle.GetNormalized();
+<#
+	string math = "Math";
+	if (type == "float") math = "MathF";
+#>
+			<#= type #> interLeft = <#= math #>.Max(r1.Left, r2.Left);
+			<#= type #> interTop = <#= math #>.Max(r1.Top, r2.Top);
+			<#= type #> interRight = <#= math #>.Max(r1.Left + r1.Width, r2.Left + r2.Width);
+			<#= type #> interBottom = <#= math #>.Max(r1.Top + r1.Height, r2.Top + r2.Height);
+
+			if ((interLeft < interRight) && (interTop < interBottom))
+			{
+				intersection = new(interLeft, interTop, interRight - interLeft, interBottom - interTop);
+				return true;
+			}
+			else
+			{
+				intersection = default;
+				return false;
+			}
+		}
+
+		public bool Equals(<#= name #> other)
+		{
+			return Left.Equals(other.Left)
+				&& Top.Equals(other.Top)
+				&& Width.Equals(other.Width)
+				&& Height.Equals(other.Height);
+		}
+
+		public override bool Equals([NotNullWhen(true)] object? obj)
+		{
+			return obj is <#= name #> other && Equals(other);
+		}
+
+		public override int GetHashCode()
+		{
+			return HashCode.Combine(Left, Top, Width, Height);
+		}
+
+		public string ToString(string? format, IFormatProvider? formatProvider)
+		{
+			return this.Format(format, formatProvider);
+		}
+
+		#endregion
+
+		#region Operators
+
+		public static bool operator ==(<#= name #> left, <#= name #> right)
+		{
+			return left.Left == right.Left
+				&& left.Top == right.Top
+				&& left.Width == right.Width
+				&& left.Height == right.Height;
+		}
+
+		public static bool operator !=(<#= name #> left, <#= name #> right)
+		{
+			return left.Left != right.Left
+				|| left.Top != right.Top
+				|| left.Width != right.Width
+				|| left.Height != right.Height;
+		}
+
+		#endregion
+
+		#region Cast Operators
+
+		public static implicit operator (<#= vector #>, <#= vector #>)(<#= name #> value)
+		{
+			return (value.Position, value.Size);
+		}
+		public static implicit operator <#= name #>((<#= vector #> position, <#= vector #> size) value)
+		{
+			return new(value.position, value.size);
+		}
+
+		public static implicit operator (<#= type #>, <#= type #>, <#= type #>, <#= type #>)(<#= name #> value)
+		{
+			return (value.Left, value.Top, value.Width, value.Height);
+		}
+		public static implicit operator <#= name #>((<#= type #> left, <#= type #> top, <#= type #> width, <#= type #> height) value)
+		{
+			return new(value.left, value.top, value.width, value.height);
+		}
+
+		[RequiresPreviewFeatures]
+		public static implicit operator Rect<<#= type #>>(<#= name #> value)
+		{
+			return new(value.Left, value.Top, value.Width, value.Height);
+		}
+		[RequiresPreviewFeatures]
+		public static implicit operator <#= name #>(Rect<<#= type #>> value)
+		{
+			return new(value.Left, value.Top, value.Width, value.Height);
+		}
+
+<#
+	foreach ((string name, string type, string vector, bool unsigned) toConvert in rect)
+	{
+		if (toConvert.name != name)
+		{
+		string castTo = type == "float" ? string.Empty : $"({type})";
+#>
+		public static explicit operator <#= name #>(<#= toConvert.name #> value)
+		{
+			return new(<#= castTo #>value.Left, <#= castTo #>value.Top, <#= castTo #>value.Width, <#= castTo #>value.Height);
+		}
+<#
+		}
+	}
+
+	string castToType = type == "float" ? string.Empty : $"({type})";
+#>
+
+		public static explicit operator RectangleF(<#= name #> value)
+		{
+			return new(value.Left, value.Top, value.Width, value.Height);
+		}
+		public static explicit operator <#= name #>(RectangleF value)
+		{
+			return new(<#= castToType #>value.X, <#= castToType #>value.Y, <#= castToType #>value.Width, <#= castToType #>value.Height);
+		}
+<#
+	string castFromType = "(int)";
+
+	if (type == "int")
+	{
+		castFromType = string.Empty;
+		castToType = string.Empty;
+	}
+	else if (type == "float")
+	{
+		castToType = string.Empty;
+	}
+	else
+	{
+		castToType = $"({type})";
+	}
+#>
+
+		public static explicit operator Rectangle(<#= name #> value)
+		{
+			return new(<#= castFromType #>value.Left, <#= castFromType #>value.Top, <#= castFromType #>value.Width, <#= castFromType #>value.Height);
+		}
+		public static explicit operator <#= name #>(Rectangle value)
+		{
+			return new(<#= castToType #>value.X, <#= castToType #>value.Y, <#= castToType #>value.Width, <#= castToType #>value.Height);
+		}
+
+		#endregion
+	}
+
+<#
+}
+#>
+}
