@@ -56,12 +56,14 @@ namespace SFML.Graphics
 		bool ICollection.IsSynchronized => false;
 		object ICollection.SyncRoot => this;
 
-		bool ICollection<float>.IsReadOnly => true;
+		bool ICollection<float>.IsReadOnly => false;
 
 		bool IList.IsFixedSize => true;
 		bool IList.IsReadOnly => false;
 
-		public static readonly Transform Identity = new();
+		public bool IsIdentity => Equals(Identity);
+
+		public static Transform Identity => new();
 
 		#endregion
 
@@ -253,7 +255,7 @@ namespace SFML.Graphics
 			public float Current => _transform._matrix[_i];
 			object IEnumerator.Current => Current;
 
-			public Enumerator(Transform transform)
+			public Enumerator(in Transform transform)
 			{
 				_transform = transform;
 			}
@@ -296,15 +298,29 @@ namespace SFML.Graphics
 
 		public bool Equals(Transform other)
 		{
+			//return _matrix[0].Equals(other._matrix[0])
+			//	&& _matrix[1].Equals(other._matrix[1])
+			//	&& _matrix[2].Equals(other._matrix[2])
+			//	&& _matrix[3].Equals(other._matrix[3])
+			//	&& _matrix[4].Equals(other._matrix[4])
+			//	&& _matrix[5].Equals(other._matrix[5])
+			//	&& _matrix[6].Equals(other._matrix[6])
+			//	&& _matrix[7].Equals(other._matrix[7])
+			//	&& _matrix[8].Equals(other._matrix[8]);
+
+			// Check diagonal elements first.
 			return _matrix[0].Equals(other._matrix[0])
+				&& _matrix[4].Equals(other._matrix[3])
+				&& _matrix[8].Equals(other._matrix[8])
+
 				&& _matrix[1].Equals(other._matrix[1])
 				&& _matrix[2].Equals(other._matrix[2])
+
 				&& _matrix[3].Equals(other._matrix[3])
-				&& _matrix[4].Equals(other._matrix[4])
 				&& _matrix[5].Equals(other._matrix[5])
+
 				&& _matrix[6].Equals(other._matrix[6])
-				&& _matrix[7].Equals(other._matrix[7])
-				&& _matrix[8].Equals(other._matrix[8]);
+				&& _matrix[7].Equals(other._matrix[7]);
 		}
 
 		public override bool Equals([NotNullWhen(true)] object? obj)
@@ -315,15 +331,9 @@ namespace SFML.Graphics
 		public override int GetHashCode()
 		{
 			HashCode hashCode = new();
-			hashCode.Add(_matrix[0]);
-			hashCode.Add(_matrix[1]);
-			hashCode.Add(_matrix[2]);
-			hashCode.Add(_matrix[3]);
-			hashCode.Add(_matrix[4]);
-			hashCode.Add(_matrix[5]);
-			hashCode.Add(_matrix[6]);
-			hashCode.Add(_matrix[7]);
-			hashCode.Add(_matrix[8]);
+			hashCode.Add(_matrix[0]); hashCode.Add(_matrix[1]); hashCode.Add(_matrix[2]);
+			hashCode.Add(_matrix[3]); hashCode.Add(_matrix[4]); hashCode.Add(_matrix[5]);
+			hashCode.Add(_matrix[6]); hashCode.Add(_matrix[7]); hashCode.Add(_matrix[8]);
 			return hashCode.ToHashCode();
 		}
 
@@ -511,28 +521,54 @@ namespace SFML.Graphics
 
 		public static bool operator ==(Transform left, Transform right)
 		{
-			return left.M00 == right.M00
-				&& left.M01 == right.M01
-				&& left.M02 == right.M02
-				&& left.M10 == right.M10
-				&& left.M11 == right.M11
-				&& left.M12 == right.M12
-				&& left.M20 == right.M20
-				&& left.M21 == right.M21
-				&& left.M22 == right.M22;
+			//return left.M00 == right.M00
+			//	&& left.M01 == right.M01
+			//	&& left.M02 == right.M02
+			//	&& left.M10 == right.M10
+			//	&& left.M11 == right.M11
+			//	&& left.M12 == right.M12
+			//	&& left.M20 == right.M20
+			//	&& left.M21 == right.M21
+			//	&& left.M22 == right.M22;
+
+			return left._matrix[0] == right._matrix[0]
+				&& left._matrix[4] == right._matrix[3]
+				&& left._matrix[8] == right._matrix[8]
+
+				&& left._matrix[1] == right._matrix[1]
+				&& left._matrix[2] == right._matrix[2]
+
+				&& left._matrix[3] == right._matrix[3]
+				&& left._matrix[5] == right._matrix[5]
+
+				&& left._matrix[6] == right._matrix[6]
+				&& left._matrix[7] == right._matrix[7];
 		}
 
 		public static bool operator !=(Transform left, Transform right)
 		{
-			return left.M00 != right.M00
-				|| left.M01 != right.M01
-				|| left.M02 != right.M02
-				|| left.M10 != right.M10
-				|| left.M11 != right.M11
-				|| left.M12 != right.M12
-				|| left.M20 != right.M20
-				|| left.M21 != right.M21
-				|| left.M22 != right.M22;
+			//return left.M00 != right.M00
+			//	|| left.M01 != right.M01
+			//	|| left.M02 != right.M02
+			//	|| left.M10 != right.M10
+			//	|| left.M11 != right.M11
+			//	|| left.M12 != right.M12
+			//	|| left.M20 != right.M20
+			//	|| left.M21 != right.M21
+			//	|| left.M22 != right.M22;
+
+			return left._matrix[0] != right._matrix[0]
+				|| left._matrix[4] != right._matrix[3]
+				|| left._matrix[8] != right._matrix[8]
+
+				|| left._matrix[1] != right._matrix[1]
+				|| left._matrix[2] != right._matrix[2]
+
+				|| left._matrix[3] != right._matrix[3]
+				|| left._matrix[5] != right._matrix[5]
+
+				|| left._matrix[6] != right._matrix[6]
+				|| left._matrix[7] != right._matrix[7];
 		}
 
 		public static Transform operator *(Transform left, Transform right)
@@ -551,9 +587,9 @@ namespace SFML.Graphics
 			(Transform value)
 		{
 			return (
-				value.M00, value.M01, value.M02,
-				value.M10, value.M11, value.M12,
-				value.M20, value.M21, value.M22);
+				value._matrix[0], value._matrix[1], value._matrix[2],
+				value._matrix[3], value._matrix[4], value._matrix[5],
+				value._matrix[6], value._matrix[7], value._matrix[8]);
 		}
 
 		public static implicit operator Transform((
@@ -577,15 +613,28 @@ namespace SFML.Graphics
 				m[12], m[13], m[14], m[15]);
 		}
 
-		// TODO: Find out how to implement casting from Matrix4x4
-
 		//public static explicit operator Transform(Matrix4x4 value)
 		//{
 		//	return new(
-		//		value.M11, value.M12, value.M14,
-		//		value.M21, value.M22, value.M24,
-		//		value.M41, value.M42, value.M44);
+		//		value.M11, value.M21, value.M41,
+		//		value.M12, value.M22, value.M42,
+		//		value.M14, value.M24, value.M44);
 		//}
+
+		public static explicit operator Matrix3x2(Transform value)
+		{
+			return new(
+				value._matrix[0], value._matrix[2], value._matrix[4],
+				value._matrix[1], value._matrix[3], value._matrix[5]);
+		}
+
+		public static explicit operator Transform(Matrix3x2 value)
+		{
+			return new(
+				value.M11, value.M12, 0,
+				value.M21, value.M22, 0,
+				value.M31, value.M32, 1);
+		}
 
 		#endregion
 	}

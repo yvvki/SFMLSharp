@@ -94,7 +94,15 @@ namespace SFML.Graphics
 			set
 			{
 				_font = value;
-				FontHandle = _font!.Handle;
+				if (_font is not null)
+				{
+					_font.ThrowIfNotCreated();
+					FontHandle = _font.Handle;
+				}
+				else
+				{
+					FontHandle = null;
+				}
 			}
 		}
 

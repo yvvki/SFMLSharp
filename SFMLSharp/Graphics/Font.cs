@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 using SFML.System;
 
@@ -26,7 +27,14 @@ namespace SFML.Graphics
 	{
 		internal Native* Handle;
 
-		public FontInfo Info => sfFont_getInfo(Handle);
+		public FontInfo Info
+		{
+			get
+			{
+				ThrowIfNotCreated();
+				return sfFont_getInfo(Handle);
+			}
+		}
 
 		internal Font(Native* handle)
 		{
@@ -88,6 +96,7 @@ namespace SFML.Graphics
 
 		public Glyph GetGlyph(uint codePoint, uint characterSize, bool bold = default, float outlineThickness = default)
 		{
+			ThrowIfNotCreated();
 			return sfFont_getGlyph(Handle,
 				codePoint,
 				characterSize,
@@ -115,31 +124,49 @@ namespace SFML.Graphics
 
 		public float GetKerning(uint first, uint second, uint characterSize)
 		{
+			ThrowIfNotCreated();
 			return sfFont_getKerning(Handle, first, second, characterSize);
 		}
 
 		public float GetLineSpacing(uint characterSize)
 		{
+			ThrowIfNotCreated();
 			return sfFont_getLineSpacing(Handle, characterSize);
 		}
 
 		public float GetUnderlinePosition(uint characterSize)
 		{
+			ThrowIfNotCreated();
 			return sfFont_getUnderlinePosition(Handle, characterSize);
 		}
 
 		public float GetUnderlineThickness(uint characterSize)
 		{
+			ThrowIfNotCreated();
 			return sfFont_getUnderlineThickness(Handle, characterSize);
 		}
 
-		public Texture GetTexture(uint characterSize)
+		public Texture CreateTexture(uint characterSize)
 		{
+			ThrowIfNotCreated();
 			return new(sfFont_getTexture(Handle, characterSize));
 		}
 
+		internal void ThrowIfNotCreated()
+		{
+			if (Handle is null) ThrowNotCreated();
+		}
+
+		[DoesNotReturn]
+		private static void ThrowNotCreated()
+		{
+			throw new InvalidOperationException("Font is not created.");
+		}
+
+		/// <inheritdoc cref="ICloneable.Clone"/>
 		public Font Clone()
 		{
+			ThrowIfNotCreated();
 			return new(sfFont_copy(Handle));
 		}
 
@@ -161,7 +188,7 @@ namespace SFML.Graphics
 		{
 			if (_disposed) return;
 
-			if (disposing) sfFont_destroy(Handle);
+			if (disposing && Handle is not null) sfFont_destroy(Handle);
 
 			_disposed = true;
 		}

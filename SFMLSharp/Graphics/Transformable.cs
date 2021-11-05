@@ -16,24 +16,6 @@ namespace SFML.Graphics
 
 		public Transform GetTransform();
 		public Transform GetInverseTransform();
-
-		public static Transform Calculate(ITransformable transformable)
-		{
-			float angle = -transformable.Rotation * 3.141592654f / 180f;
-			float cosine = (float)Math.Cos(angle);
-			float sine = (float)Math.Sin(angle);
-			float sxc = transformable.Scaling.X * cosine;
-			float syc = transformable.Scaling.Y * cosine;
-			float sxs = transformable.Scaling.X * sine;
-			float sys = transformable.Scaling.Y * sine;
-			float tx = -transformable.Origin.X * sxc - transformable.Origin.Y * sys + transformable.Position.X;
-			float ty = transformable.Origin.X * sxs - transformable.Origin.Y * syc + transformable.Position.Y;
-
-			return new(
-				sxc, sys, tx,
-				-sxs, syc, ty,
-				0f, 0f, 1f);
-		}
 	}
 
 	public class Transformable : ITransformable
@@ -111,19 +93,7 @@ namespace SFML.Graphics
 		{
 			if (_transformNeedUpdate)
 			{
-				float angle = -_rotation * 3.141592654f / 180f;
-				float cosine = (float)Math.Cos(angle);
-				float sine = (float)Math.Sin(angle);
-				float sxc = _size.X * cosine;
-				float syc = _size.Y * cosine;
-				float sxs = _size.X * sine;
-				float sys = _size.Y * sine;
-				float tx = -_origin.X * sxc - _origin.Y * sys + _position.X;
-				float ty = _origin.X * sxs - _origin.Y * syc + _position.Y;
-
-				_transform = new(sxc, sys, tx,
-										-sxs, syc, ty,
-										 0f, 0f, 1f);
+				_transform = this.CalculateTransform();
 				_transformNeedUpdate = false;
 			}
 

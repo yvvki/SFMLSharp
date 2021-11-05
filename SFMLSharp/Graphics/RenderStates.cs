@@ -13,16 +13,16 @@ namespace SFML.Graphics
 
 		public RenderStates() : this(BlendMode.Alpha) { }
 
-		public RenderStates(Transform transform) : this(
-			BlendMode.Alpha,
-			transform,
+		public RenderStates(BlendMode blendMode) : this(
+			blendMode,
+			Transform.Identity,
 			default,
 			default)
 		{ }
 
-		public RenderStates(BlendMode blendMode) : this(
-			blendMode,
-			Transform.Identity,
+		public RenderStates(Transform transform) : this(
+			BlendMode.Alpha,
+			transform,
 			default,
 			default)
 		{ }
@@ -37,7 +37,7 @@ namespace SFML.Graphics
 		public RenderStates(Shader shader) : this(
 			BlendMode.Alpha,
 			Transform.Identity,
-			null,
+			default,
 			shader)
 		{ }
 
