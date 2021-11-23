@@ -116,7 +116,7 @@ namespace SFML.System
 
 		#region Methods
 
-		
+
 
 		#endregion
 

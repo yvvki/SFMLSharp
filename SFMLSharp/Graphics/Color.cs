@@ -6,8 +6,6 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-using SFML.System;
-
 namespace SFML.Graphics
 {
 	/// <summary>

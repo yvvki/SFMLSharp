@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Transactions;
 
 using SFML.System;
 
@@ -95,10 +94,7 @@ namespace SFML.Graphics
 			get => this[index];
 			set => this[index] = value;
 		}
-		float IReadOnlyList<float>.this[int index]
-		{
-			get => this[index];
-		}
+		float IReadOnlyList<float>.this[int index] => this[index];
 
 		object? IList.this[int index]
 		{

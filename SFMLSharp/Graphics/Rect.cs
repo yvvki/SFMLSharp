@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Text;
@@ -59,7 +56,8 @@ namespace SFML.Graphics
 				position.X,
 				position.Y,
 				size.X,
-				size.Y) { }
+				size.Y)
+		{ }
 
 		public Rect(T left, T top, T width, T height)
 		{

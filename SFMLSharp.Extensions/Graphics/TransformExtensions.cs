@@ -5,7 +5,6 @@ using SFML.System;
 namespace SFML.Graphics
 {
 	public static class TransformExtensions
-
 	{
 		public static Matrix3x2 CreateTranslation(Vector2<float> position)
 		{
