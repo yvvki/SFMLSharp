@@ -19,7 +19,7 @@ namespace SFML.Graphics
 
 		#region Properties
 
-		public Vector2F Position
+		public Vector2<float> Position
 		{
 			get => sfSprite_getPosition(Handle);
 			set => sfSprite_setPosition(Handle, value);
@@ -29,12 +29,12 @@ namespace SFML.Graphics
 			get => sfSprite_getRotation(Handle);
 			set => sfSprite_setRotation(Handle, value);
 		}
-		public Vector2F Scaling
+		public Vector2<float> Scaling
 		{
 			get => sfSprite_getScale(Handle);
 			set => sfSprite_setScale(Handle, value);
 		}
-		public Vector2F Origin
+		public Vector2<float> Origin
 		{
 			get => sfSprite_getOrigin(Handle);
 			set => sfSprite_setOrigin(Handle, value);
@@ -63,7 +63,7 @@ namespace SFML.Graphics
 				TextureHandle = _texture!.Handle;
 			}
 		}
-		public IntRect TextureRect
+		public Rect<int> TextureRect
 		{
 			get => sfSprite_getTextureRect(Handle);
 			set => sfSprite_setTextureRect(Handle, value);
@@ -110,9 +110,9 @@ namespace SFML.Graphics
 
 		#endregion
 
-		#region Interface Method Implementations
+		#region Interface Methods
 
-		public void Move(Vector2F offset)
+		public void Move(Vector2<float> offset)
 		{
 			sfSprite_move(Handle, offset);
 		}
@@ -122,7 +122,7 @@ namespace SFML.Graphics
 			sfSprite_rotate(Handle, angle);
 		}
 
-		public void Scale(Vector2F factor)
+		public void Scale(Vector2<float> factor)
 		{
 			sfSprite_scale(Handle, factor);
 		}
@@ -137,12 +137,12 @@ namespace SFML.Graphics
 			return sfSprite_getInverseTransform(Handle);
 		}
 
-		public FloatRect GetLocalBounds()
+		public Rect<float> GetLocalBounds()
 		{
 			return sfSprite_getLocalBounds(Handle);
 		}
 
-		public FloatRect GetGlobalBounds()
+		public Rect<float> GetGlobalBounds()
 		{
 			return sfSprite_getGlobalBounds(Handle);
 		}
@@ -191,37 +191,37 @@ namespace SFML.Graphics
 		private static extern void sfSprite_destroy(Native* sprite);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfSprite_setPosition(Native* sprite, Vector2F position);
+		private static extern void sfSprite_setPosition(Native* sprite, Vector2<float> position);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfSprite_setRotation(Native* sprite, float angle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfSprite_setScale(Native* sprite, Vector2F scale);
+		private static extern void sfSprite_setScale(Native* sprite, Vector2<float> scale);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfSprite_setOrigin(Native* sprite, Vector2F origin);
+		private static extern void sfSprite_setOrigin(Native* sprite, Vector2<float> origin);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfSprite_getPosition(Native* sprite);
+		private static extern Vector2<float> sfSprite_getPosition(Native* sprite);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern float sfSprite_getRotation(Native* sprite);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfSprite_getScale(Native* sprite);
+		private static extern Vector2<float> sfSprite_getScale(Native* sprite);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfSprite_getOrigin(Native* sprite);
+		private static extern Vector2<float> sfSprite_getOrigin(Native* sprite);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfSprite_move(Native* sprite, Vector2F offset);
+		private static extern void sfSprite_move(Native* sprite, Vector2<float> offset);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfSprite_rotate(Native* sprite, float angle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfSprite_scale(Native* sprite, Vector2F factors);
+		private static extern void sfSprite_scale(Native* sprite, Vector2<float> factors);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Transform sfSprite_getTransform(Native* sprite);
@@ -233,7 +233,7 @@ namespace SFML.Graphics
 		private static extern void sfSprite_setTexture(Native* sprite, Texture.Native* texture, bool resetRect);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfSprite_setTextureRect(Native* sprite, IntRect rect);
+		private static extern void sfSprite_setTextureRect(Native* sprite, Rect<int> rect);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfSprite_setColor(Native* sprite, Color color);
@@ -242,16 +242,16 @@ namespace SFML.Graphics
 		private static extern Texture.Native* sfSprite_getTexture(Native* sprite);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntRect sfSprite_getTextureRect(Native* sprite);
+		private static extern Rect<int> sfSprite_getTextureRect(Native* sprite);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Color sfSprite_getColor(Native* sprite);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfSprite_getLocalBounds(Native* sprite);
+		private static extern Rect<float> sfSprite_getLocalBounds(Native* sprite);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfSprite_getGlobalBounds(Native* sprite);
+		private static extern Rect<float> sfSprite_getGlobalBounds(Native* sprite);
 
 		#endregion
 	}

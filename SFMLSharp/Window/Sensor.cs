@@ -86,7 +86,7 @@ namespace SFML.Window
 		/// </summary>
 		/// <param name="sensor">Sensor to read.</param>
 		/// <returns>The current sensor value.</returns>
-		public static Vector3F GetValue(SensorType sensor)
+		public static Vector3<float> GetValue(SensorType sensor)
 		{
 			return sfSensor_getValue(sensor);
 		}
@@ -100,7 +100,7 @@ namespace SFML.Window
 		private static extern void sfSensor_setEnabled(SensorType sensor, bool enabled);
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector3F sfSensor_getValue(SensorType sensor);
+		private static extern Vector3<float> sfSensor_getValue(SensorType sensor);
 
 		#endregion
 	}

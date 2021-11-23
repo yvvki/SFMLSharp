@@ -8,7 +8,7 @@
 	public interface ITextured
 	{
 		Texture? Texture { get; set; }
-		IntRect TextureRect { get; set; }
+		Rect<int> TextureRect { get; set; }
 	}
 
 	public interface IFillOutlined

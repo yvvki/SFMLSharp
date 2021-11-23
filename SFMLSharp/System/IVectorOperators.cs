@@ -8,7 +8,7 @@ namespace SFML.System
 	/// <typeparam name="TSelf">The type that implement the interface.</typeparam>
 	/// <typeparam name="TNumber">The component type.</typeparam>
 	[RequiresPreviewFeatures]
-	public interface IVectorOperators<TSelf, TNumber> :
+	internal interface IVectorOperators<TSelf, TNumber> :
 		IEqualityOperators<TSelf, TSelf>,
 		IAdditiveIdentity<TSelf, TSelf>,
 		IMultiplicativeIdentity<TSelf, TSelf>,
@@ -23,11 +23,11 @@ namespace SFML.System
 		static abstract TSelf Zero { get; }
 		static abstract TSelf One { get; }
 
-		//abstract static TSelf Negate(TSelf value);
-		//abstract static TSelf Add(TSelf left, TSelf right);
-		//abstract static TSelf Subtract(TSelf left, TSelf right);
-		//abstract static TSelf Multiply(TSelf left, TSelf right);
-		//abstract static TSelf Divide(TSelf left, TSelf right);
+		static abstract TSelf Negate(TSelf value);
+		static abstract TSelf Add(TSelf left, TSelf right);
+		static abstract TSelf Subtract(TSelf left, TSelf right);
+		static abstract TSelf Multiply(TSelf left, TSelf right);
+		static abstract TSelf Divide(TSelf left, TSelf right);
 
 		static abstract TSelf operator *(TSelf left, TNumber right);
 		static abstract TSelf operator *(TNumber left, TSelf right);

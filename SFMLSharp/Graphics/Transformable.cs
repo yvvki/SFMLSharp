@@ -5,14 +5,14 @@ namespace SFML.Graphics
 {
 	public interface ITransformable
 	{
-		public Vector2F Position { get; set; }
+		public Vector2<float> Position { get; set; }
 		public float Rotation { get; set; }
-		public Vector2F Scaling { get; set; }
-		public Vector2F Origin { get; set; }
+		public Vector2<float> Scaling { get; set; }
+		public Vector2<float> Origin { get; set; }
 
-		public void Move(Vector2F offset);
+		public void Move(Vector2<float> offset);
 		public void Rotate(float angle);
-		public void Scale(Vector2F factor);
+		public void Scale(Vector2<float> factor);
 
 		public Transform GetTransform();
 		public Transform GetInverseTransform();
@@ -20,8 +20,8 @@ namespace SFML.Graphics
 
 	public class Transformable : ITransformable
 	{
-		private Vector2F _position;
-		public Vector2F Position
+		private Vector2<float> _position;
+		public Vector2<float> Position
 		{
 			get => _position;
 			set
@@ -44,8 +44,8 @@ namespace SFML.Graphics
 			}
 		}
 
-		private Vector2F _size;
-		public Vector2F Scaling
+		private Vector2<float> _size;
+		public Vector2<float> Scaling
 		{
 			get => _size;
 			set
@@ -56,8 +56,8 @@ namespace SFML.Graphics
 			}
 		}
 
-		private Vector2F _origin;
-		public Vector2F Origin
+		private Vector2<float> _origin;
+		public Vector2<float> Origin
 		{
 			get => _origin;
 			set
@@ -68,7 +68,7 @@ namespace SFML.Graphics
 			}
 		}
 
-		public void Move(Vector2F offset)
+		public void Move(Vector2<float> offset)
 		{
 			Position += offset;
 		}
@@ -78,7 +78,7 @@ namespace SFML.Graphics
 			Rotation += angle;
 		}
 
-		public void Scale(Vector2F factor)
+		public void Scale(Vector2<float> factor)
 		{
 			Scaling += factor;
 		}

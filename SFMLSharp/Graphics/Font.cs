@@ -19,7 +19,7 @@ namespace SFML.Graphics
 	/// <param name="Advance">Offset to move horizontically to the next character.</param>
 	/// <param name="Bounds">Bounding rectangle of the glyph, in coordinates relative to the baseline.</param>
 	/// <param name="TextureRect">Texture coordinates of the glyph inside the font's image.</param>
-	public record struct Glyph(float Advance, FloatRect Bounds, IntRect TextureRect);
+	public record struct Glyph(float Advance, Rect<float> Bounds, Rect<int> TextureRect);
 
 	public unsafe class Font :
 		ICloneable,

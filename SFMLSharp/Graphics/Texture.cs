@@ -22,13 +22,13 @@ namespace SFML.Graphics
 
 		public static readonly uint MaxSize = sfTexture_getMaximumSize();
 
-		public Vector2U Size => sfTexture_getSize(Handle);
+		public Vector2<uint> Size => sfTexture_getSize(Handle);
 
 		internal int Length
 		{
 			get
 			{
-				Vector2U size = Size;
+				Vector2<uint> size = Size;
 				return (int)(size.X * size.Y);
 			}
 		}
@@ -65,33 +65,33 @@ namespace SFML.Graphics
 		public Texture(uint width, uint height)
 			: this(sfTexture_create(width, height)) { }
 
-		public Texture(IReadOnlyVector2<uint> size) : this(size.X, size.Y) { }
+		public Texture(Vector2<uint> size) : this(size.X, size.Y) { }
 
-		public static Texture FromFile(string filename, IntRect? area = null)
+		public static Texture FromFile(string filename, Rect<int>? area = null)
 		{
-			IntRect area_notnull = area.HasValue ? area.Value : default;
+			Rect<int> area_notnull = area ?? default;
 			return new(sfTexture_createFromFile(filename, area.HasValue ? &area_notnull : null));
 		}
 
-		public static Texture FromMemory(ReadOnlySpan<byte> data, IntRect? area = null)
+		public static Texture FromMemory(ReadOnlySpan<byte> data, Rect<int>? area = null)
 		{
-			IntRect area_notnull = area.HasValue ? area.Value : default;
+			Rect<int> area_notnull = area ?? default;
 			fixed (byte* data_ptr = data)
 			{
 				return new(sfTexture_createFromMemory(data_ptr, (nuint)data.Length, area.HasValue ? &area_notnull : null));
 			}
 		}
 
-		public static Texture FromStream(Stream stream, IntRect? area = null)
+		public static Texture FromStream(Stream stream, Rect<int>? area = null)
 		{
 			using InputStream inputStream = new(stream);
-			IntRect area_notnull = area.HasValue ? area.Value : default;
+			Rect<int> area_notnull = area ?? default;
 			return new(sfTexture_createFromStream(&inputStream, area.HasValue ? &area_notnull : null));
 		}
 
-		public static Texture FromImage(Image image, IntRect? area = null)
+		public static Texture FromImage(Image image, Rect<int>? area = null)
 		{
-			IntRect area_notnull = area.HasValue ? area.Value : default;
+			Rect<int> area_notnull = area ?? default;
 			return new(sfTexture_createFromImage(image.Handle, area.HasValue ? &area_notnull : null));
 		}
 
@@ -128,7 +128,7 @@ namespace SFML.Graphics
 			}
 		}
 
-		public void Update(ReadOnlySpan<Color> pixels, IReadOnlyVector2<uint> size, uint x, uint y)
+		public void Update(ReadOnlySpan<Color> pixels, Vector2<uint> size, uint x, uint y)
 		{
 			Update(
 				pixels,
@@ -138,7 +138,7 @@ namespace SFML.Graphics
 				y);
 		}
 
-		public void Update(ReadOnlySpan<Color> pixels, uint width, uint height, IReadOnlyVector2<uint> offset)
+		public void Update(ReadOnlySpan<Color> pixels, uint width, uint height, Vector2<uint> offset)
 		{
 			Update(
 				pixels,
@@ -148,7 +148,7 @@ namespace SFML.Graphics
 				offset.Y);
 		}
 
-		public void Update(ReadOnlySpan<Color> pixels, IReadOnlyVector2<uint> size, IReadOnlyVector2<uint> offset)
+		public void Update(ReadOnlySpan<Color> pixels, Vector2<uint> size, Vector2<uint> offset)
 		{
 			Update(
 				pixels,
@@ -163,7 +163,7 @@ namespace SFML.Graphics
 			sfTexture_updateFromTexture(Handle, texture.Handle, x, y);
 		}
 
-		public void Update(Texture texture, IReadOnlyVector2<uint> offset)
+		public void Update(Texture texture, Vector2<uint> offset)
 		{
 			Update(texture, offset.X, offset.Y);
 		}
@@ -173,7 +173,7 @@ namespace SFML.Graphics
 			sfTexture_updateFromImage(Handle, image.Handle, x, y);
 		}
 
-		public void Update(Image image, IReadOnlyVector2<uint> offset)
+		public void Update(Image image, Vector2<uint> offset)
 		{
 			Update(image, offset.X, offset.Y);
 		}
@@ -183,7 +183,7 @@ namespace SFML.Graphics
 			sfTexture_updateFromWindow(Handle, window.Handle, x, y);
 		}
 
-		public void Update(Window.Window window, IReadOnlyVector2<uint> offset)
+		public void Update(Window.Window window, Vector2<uint> offset)
 		{
 			Update(window, offset.X, offset.Y);
 		}
@@ -215,7 +215,7 @@ namespace SFML.Graphics
 
 		#endregion
 
-		#region Interface Method Implementations
+		#region Interface Methods
 
 		public Texture Clone()
 		{
@@ -269,16 +269,16 @@ namespace SFML.Graphics
 		private static extern Native* sfTexture_create(uint width, uint height);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-		private static extern Native* sfTexture_createFromFile(string filename, IntRect* area);
+		private static extern Native* sfTexture_createFromFile(string filename, Rect<int>* area);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Native* sfTexture_createFromMemory(void* data, nuint sizeInBytes, IntRect* area);
+		private static extern Native* sfTexture_createFromMemory(void* data, nuint sizeInBytes, Rect<int>* area);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Native* sfTexture_createFromStream(InputStream* stream, IntRect* area);
+		private static extern Native* sfTexture_createFromStream(InputStream* stream, Rect<int>* area);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Native* sfTexture_createFromImage(Image.Native* image, IntRect* area);
+		private static extern Native* sfTexture_createFromImage(Image.Native* image, Rect<int>* area);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Native* sfTexture_copy(Native* texture);
@@ -287,7 +287,7 @@ namespace SFML.Graphics
 		private static extern void sfTexture_destroy(Native* texture);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2U sfTexture_getSize(Native* texture);
+		private static extern Vector2<uint> sfTexture_getSize(Native* texture);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Image.Native* sfTexture_copyToImage(Native* texture);

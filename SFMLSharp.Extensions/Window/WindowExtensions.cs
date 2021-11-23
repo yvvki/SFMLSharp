@@ -7,7 +7,7 @@ namespace SFML.Window
 {
 	public static class WindowExtensions
 	{
-		public static Vector2I GetMousePosition(this Window @this)
+		public static Vector2<int> GetMousePosition(this Window @this)
 		{
 			return Mouse.GetPosition(@this);
 		}
@@ -20,7 +20,7 @@ namespace SFML.Window
 				(byte*)pixels);
 		}
 
-		public static unsafe void SetIcon(this Window @this, IReadOnlyVector2<uint> size, Color* pixels)
+		public static unsafe void SetIcon(this Window @this, Vector2<uint> size, Color* pixels)
 		{
 			@this.SetIcon(size.X, size.Y, pixels);
 		}
@@ -39,7 +39,7 @@ namespace SFML.Window
 			}
 		}
 
-		public static unsafe void SetIcon(this Window @this, IReadOnlyVector2<uint> size, ReadOnlySpan<Color> pixels)
+		public static unsafe void SetIcon(this Window @this, Vector2<uint> size, ReadOnlySpan<Color> pixels)
 		{
 			@this.SetIcon(size.X, size.Y, pixels);
 		}
@@ -58,7 +58,7 @@ namespace SFML.Window
 		{
 			if (image is null) throw new ArgumentNullException(nameof(image));
 
-			Vector2U size = image.Size;
+			Vector2<uint> size = image.Size;
 			@this.SetIcon(size.X, size.Y, image.GetPixelsPointer());
 		}
 	}

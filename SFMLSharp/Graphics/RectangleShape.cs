@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 using SFML.System;
 
@@ -6,6 +7,7 @@ using static SFML.Graphics.DllName;
 
 namespace SFML.Graphics
 {
+	[RequiresPreviewFeatures]
 	public unsafe class RectangleShape :
 		ReadOnlyShape,
 		ICloneable
@@ -14,17 +16,17 @@ namespace SFML.Graphics
 
 		public int Count => GetPointCount();
 
-		public Vector2F this[int index] => GetPoint(index);
+		public Vector2<float> this[int index] => GetPoint(index);
 
 		protected override bool IsFixedSize => true;
 
-		public Vector2F Size
+		public Vector2<float> Size
 		{
 			get => sfRectangleShape_getSize(Handle);
 			set => sfRectangleShape_setSize(Handle, value);
 		}
 
-		public override Vector2F Position
+		public override Vector2<float> Position
 		{
 			get => sfRectangleShape_getPosition(Handle);
 			set => sfRectangleShape_setPosition(Handle, value);
@@ -34,12 +36,12 @@ namespace SFML.Graphics
 			get => sfRectangleShape_getRotation(Handle);
 			set => sfRectangleShape_setRotation(Handle, value);
 		}
-		public override Vector2F Scaling
+		public override Vector2<float> Scaling
 		{
 			get => sfRectangleShape_getScale(Handle);
 			set => sfRectangleShape_setScale(Handle, value);
 		}
-		public override Vector2F Origin
+		public override Vector2<float> Origin
 		{
 			get => sfRectangleShape_getOrigin(Handle);
 			set => sfRectangleShape_setOrigin(Handle, value);
@@ -62,7 +64,7 @@ namespace SFML.Graphics
 				sfRectangleShape_setTexture(Handle, value!.Handle, false);
 			}
 		}
-		public override IntRect TextureRect
+		public override Rect<int> TextureRect
 		{
 			get => sfRectangleShape_getTextureRect(Handle);
 			set => sfRectangleShape_setTextureRect(Handle, value);
@@ -111,12 +113,12 @@ namespace SFML.Graphics
 			return sfRectangleShape_getPointCount(Handle);
 		}
 
-		protected override Vector2F GetPoint(int index)
+		protected override Vector2<float> GetPoint(int index)
 		{
 			return GetPointNuint((nuint)index);
 		}
 
-		private protected override Vector2F GetPointNuint(nuint index)
+		private protected override Vector2<float> GetPointNuint(nuint index)
 		{
 			return sfRectangleShape_getPoint(Handle, index);
 		}
@@ -136,9 +138,9 @@ namespace SFML.Graphics
 
 		#endregion
 
-		#region Interface Method Implementations
+		#region Interface Methods
 
-		public override void Move(Vector2F offset)
+		public override void Move(Vector2<float> offset)
 		{
 			sfRectangleShape_move(Handle, offset);
 		}
@@ -148,7 +150,7 @@ namespace SFML.Graphics
 			sfRectangleShape_rotate(Handle, angle);
 		}
 
-		public override void Scale(Vector2F factor)
+		public override void Scale(Vector2<float> factor)
 		{
 			sfRectangleShape_scale(Handle, factor);
 		}
@@ -163,12 +165,12 @@ namespace SFML.Graphics
 			return sfRectangleShape_getInverseTransform(Handle);
 		}
 
-		public override FloatRect GetLocalBounds()
+		public override Rect<float> GetLocalBounds()
 		{
 			return sfRectangleShape_getLocalBounds(Handle);
 		}
 
-		public override FloatRect GetGlobalBounds()
+		public override Rect<float> GetGlobalBounds()
 		{
 			return sfRectangleShape_getGlobalBounds(Handle);
 		}
@@ -202,37 +204,37 @@ namespace SFML.Graphics
 		private static extern void sfRectangleShape_destroy(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfRectangleShape_setPosition(Native* shape, Vector2F position);
+		private static extern void sfRectangleShape_setPosition(Native* shape, Vector2<float> position);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfRectangleShape_setRotation(Native* shape, float angle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfRectangleShape_setScale(Native* shape, Vector2F scale);
+		private static extern void sfRectangleShape_setScale(Native* shape, Vector2<float> scale);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfRectangleShape_setOrigin(Native* shape, Vector2F origin);
+		private static extern void sfRectangleShape_setOrigin(Native* shape, Vector2<float> origin);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfRectangleShape_getPosition(Native* shape);
+		private static extern Vector2<float> sfRectangleShape_getPosition(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern float sfRectangleShape_getRotation(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfRectangleShape_getScale(Native* shape);
+		private static extern Vector2<float> sfRectangleShape_getScale(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfRectangleShape_getOrigin(Native* shape);
+		private static extern Vector2<float> sfRectangleShape_getOrigin(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfRectangleShape_move(Native* shape, Vector2F offset);
+		private static extern void sfRectangleShape_move(Native* shape, Vector2<float> offset);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfRectangleShape_rotate(Native* shape, float angle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfRectangleShape_scale(Native* shape, Vector2F factors);
+		private static extern void sfRectangleShape_scale(Native* shape, Vector2<float> factors);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Transform sfRectangleShape_getTransform(Native* shape);
@@ -244,7 +246,7 @@ namespace SFML.Graphics
 		private static extern void sfRectangleShape_setTexture(Native* shape, Texture.Native* texture, bool resetRect);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfRectangleShape_setTextureRect(Native* shape, IntRect rect);
+		private static extern void sfRectangleShape_setTextureRect(Native* shape, Rect<int> rect);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfRectangleShape_setFillColor(Native* shape, Color color);
@@ -259,7 +261,7 @@ namespace SFML.Graphics
 		private static extern Texture.Native* sfRectangleShape_getTexture(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntRect sfRectangleShape_getTextureRect(Native* shape);
+		private static extern Rect<int> sfRectangleShape_getTextureRect(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Color sfRectangleShape_getFillColor(Native* shape);
@@ -274,19 +276,19 @@ namespace SFML.Graphics
 		private static extern nuint sfRectangleShape_getPointCount(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfRectangleShape_getPoint(Native* shape, nuint index);
+		private static extern Vector2<float> sfRectangleShape_getPoint(Native* shape, nuint index);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfRectangleShape_setSize(Native* shape, Vector2F size);
+		private static extern void sfRectangleShape_setSize(Native* shape, Vector2<float> size);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfRectangleShape_getSize(Native* shape);
+		private static extern Vector2<float> sfRectangleShape_getSize(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfRectangleShape_getLocalBounds(Native* shape);
+		private static extern Rect<float> sfRectangleShape_getLocalBounds(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfRectangleShape_getGlobalBounds(Native* shape);
+		private static extern Rect<float> sfRectangleShape_getGlobalBounds(Native* shape);
 
 		#endregion
 	}

@@ -40,7 +40,7 @@ namespace SFML.Graphics
 			}
 		}
 
-		public IntRect Viewport { get; }
+		public Rect<int> Viewport { get; }
 
 		#region Constructors & Create Methods
 
@@ -98,23 +98,23 @@ namespace SFML.Graphics
 			sfRenderWindow_clear(Handle, color ?? Color.Black);
 		}
 
-		public Vector2F MapPixelToCoords(Vector2I point)
+		public Vector2<float> MapPixelToCoords(Vector2<int> point)
 		{
 			return MapPixelToCoords(point, null);
 		}
 
-		public Vector2F MapPixelToCoords(Vector2I point, View? view)
+		public Vector2<float> MapPixelToCoords(Vector2<int> point, View? view)
 		{
 			ThrowIfNotOpen();
 			return sfRenderWindow_mapPixelToCoords(Handle, point, view!.Handle);
 		}
 
-		public Vector2I MapCoordsToPixel(Vector2F point)
+		public Vector2<int> MapCoordsToPixel(Vector2<float> point)
 		{
 			return MapCoordsToPixel(point, null);
 		}
 
-		public Vector2I MapCoordsToPixel(Vector2F point, View? view)
+		public Vector2<int> MapCoordsToPixel(Vector2<float> point, View? view)
 		{
 			ThrowIfNotOpen();
 			return sfRenderWindow_mapCoordsToPixel(Handle, point, view!.Handle);
@@ -289,10 +289,10 @@ namespace SFML.Graphics
 		private static extern unsafe View.Native* sfRenderWindow_getViewport(Native* renderWindow, View.Native* view);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern unsafe Vector2F sfRenderWindow_mapPixelToCoords(Native* renderWindow, Vector2I point, View.Native* view);
+		private static extern unsafe Vector2<float> sfRenderWindow_mapPixelToCoords(Native* renderWindow, Vector2<int> point, View.Native* view);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern unsafe Vector2I sfRenderWindow_mapCoordsToPixel(Native* renderWindow, Vector2F point, View.Native* view);
+		private static extern unsafe Vector2<int> sfRenderWindow_mapCoordsToPixel(Native* renderWindow, Vector2<float> point, View.Native* view);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern unsafe void sfRenderWindow_drawSprite(

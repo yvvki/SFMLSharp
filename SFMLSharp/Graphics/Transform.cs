@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Transactions;
 
 using SFML.System;
 
@@ -21,7 +22,7 @@ namespace SFML.Graphics
 
 		internal const int FixedLength = 9;
 
-		public static readonly int Length = FixedLength;
+		public static int Length => FixedLength;
 
 		private fixed float _matrix[FixedLength];
 
@@ -35,18 +36,74 @@ namespace SFML.Graphics
 		public float M21 { get => _matrix[7]; set => _matrix[7] = value; }
 		public float M22 { get => _matrix[8]; set => _matrix[8] = value; }
 
-		public float this[int index]
+		public float this[int row, int column]
 		{
-			get => _matrix[index];
-			set => _matrix[index] = value;
+			get
+			{
+				if (row is < 0 or > 3)
+				{
+					throw new ArgumentOutOfRangeException(nameof(row));
+				}
+
+				if (column is < 0 or > 3)
+				{
+					throw new ArgumentOutOfRangeException(nameof(column));
+				}
+
+				return _matrix[row + (column * 3)];
+			}
+			set
+			{
+				if (row is < 0 or > 3)
+				{
+					throw new ArgumentOutOfRangeException(nameof(row));
+				}
+
+				if (column is < 0 or > 3)
+				{
+					throw new ArgumentOutOfRangeException(nameof(column));
+				}
+
+				_matrix[row + (column * 3)] = value;
+			}
+		}
+
+		private float this[int index]
+		{
+			get
+			{
+				if (index is < 0 or > FixedLength)
+				{
+					throw new ArgumentOutOfRangeException(nameof(index));
+				}
+
+				return _matrix[index];
+			}
+			set
+			{
+				if (index is < 0 or > FixedLength)
+				{
+					throw new ArgumentOutOfRangeException(nameof(index));
+				}
+
+				_matrix[index] = value;
+			}
+		}
+
+		float IList<float>.this[int index]
+		{
+			get => this[index];
+			set => this[index] = value;
+		}
+		float IReadOnlyList<float>.this[int index]
+		{
+			get => this[index];
 		}
 
 		object? IList.this[int index]
 		{
 			get => this[index];
-			set => this[index] =
-				value is null ? throw new ArgumentNullException(nameof(value)) :
-				value is float v ? v : throw new ArgumentException("Transform value must be of type float", nameof(value));
+			set => this[index] = (float)value!;
 		}
 
 		int ICollection.Count => Length;
@@ -64,7 +121,6 @@ namespace SFML.Graphics
 		public bool IsIdentity => Equals(Identity);
 
 		public static Transform Identity => new();
-
 		#endregion
 
 		#region Constructors
@@ -126,6 +182,14 @@ namespace SFML.Graphics
 			}
 		}
 
+		public Transform GetInverse()
+		{
+			fixed (Transform* this_ptr = &this)
+			{
+				return sfTransform_getInverse(this_ptr);
+			}
+		}
+
 		private float* GetMatrixPtr()
 		{
 			float* matrix = stackalloc float[16];
@@ -143,15 +207,7 @@ namespace SFML.Graphics
 			return new(GetMatrixPtr(), 16);
 		}
 
-		public Transform GetInverse()
-		{
-			fixed (Transform* this_ptr = &this)
-			{
-				return sfTransform_getInverse(this_ptr);
-			}
-		}
-
-		public Vector2F TransformPoint(Vector2F point)
+		public Vector2<float> TransformPoint(Vector2<float> point)
 		{
 			fixed (Transform* this_ptr = &this)
 			{
@@ -159,7 +215,7 @@ namespace SFML.Graphics
 			}
 		}
 
-		public FloatRect TransformRect(FloatRect rectangle)
+		public Rect<float> TransformRect(Rect<float> rectangle)
 		{
 			fixed (Transform* this_ptr = &this)
 			{
@@ -167,75 +223,208 @@ namespace SFML.Graphics
 			}
 		}
 
+		public void Combine(Transform other)
+		{
+			fixed (Transform* this_ptr = &this)
+			{
+				sfTransform_combine(this_ptr, &other);
+			}
+		}
+
 		public static Transform Combine(Transform transform, Transform other)
 		{
-			sfTransform_combine(&transform, &other);
+			transform.Combine(other);
 			return transform;
+		}
+
+		public void Translate(float x, float y)
+		{
+			fixed (Transform* this_ptr = &this)
+			{
+				sfTransform_translate(this_ptr, x, y);
+			}
+		}
+
+		public void Translate(Vector2<float> translates)
+		{
+			Translate(translates.X, translates.Y);
 		}
 
 		public static Transform Translate(Transform transform, float x, float y)
 		{
-			sfTransform_translate(&transform, x, y);
+			transform.Translate(x, y);
 			return transform;
 		}
 
-		public static Transform Translate(Transform transform, IReadOnlyVector2<float> value)
+		public static Transform Translate(Transform transform, Vector2<float> translates)
 		{
-			return Translate(transform, value.X, value.Y);
+			return Translate(transform, translates.X, translates.Y);
+		}
+
+		public static Transform CreateTranslate(float x, float y)
+		{
+			return Translate(Identity, x, y);
+		}
+
+		public static Transform CreateTranslate(Vector2<float> translates)
+		{
+			return CreateTranslate(translates.X, translates.Y);
+		}
+
+		public void Rotate(float angle)
+		{
+			fixed (Transform* this_ptr = &this)
+			{
+				sfTransform_rotate(this_ptr, angle);
+			}
 		}
 
 		public static Transform Rotate(Transform transform, float angle)
 		{
-			sfTransform_rotate(&transform, angle);
+			transform.Rotate(angle);
 			return transform;
+		}
+
+		public static Transform CreateRotate(float angle)
+		{
+			return Rotate(Identity, angle);
+		}
+
+		public void Rotate(float angle, float centerX, float centerY)
+		{
+			fixed (Transform* this_ptr = &this)
+			{
+				sfTransform_rotateWithCenter(this_ptr, angle, centerX, centerY);
+			}
+		}
+
+		public void Rotate(float angle, Vector2<float> center)
+		{
+			Rotate(angle, center.X, center.Y);
 		}
 
 		public static Transform Rotate(Transform transform, float angle, float centerX, float centerY)
 		{
-			sfTransform_rotateWithCenter(&transform, angle, centerX, centerY);
+			transform.Rotate(angle, centerX, centerY);
 			return transform;
 		}
 
-		public static Transform Rotate(Transform transform, float angle, IReadOnlyVector2<float> center)
+		public static Transform Rotate(Transform transform, float angle, Vector2<float> center)
 		{
 			return Rotate(transform, angle, center.X, center.Y);
 		}
 
+		public static Transform CreateRotate(float angle, float centerX, float centerY)
+		{
+			return Rotate(Identity, angle, centerX, centerY);
+		}
+
+		public static Transform CreateRotate(float angle, Vector2<float> center)
+		{
+			return CreateRotate(angle, center.X, center.Y);
+		}
+
+		public void Scale(float x, float y)
+		{
+			fixed (Transform* this_ptr = &this)
+			{
+				sfTransform_scale(this_ptr, x, y);
+			}
+		}
+
+		public void Scale(Vector2<float> scales)
+		{
+			Scale(scales.X, scales.Y);
+		}
+
+		public static Transform CreateScale(float x, float y)
+		{
+			return Scale(Identity, x, y);
+		}
+
+		public static Transform CreateScale(Vector2<float> scales)
+		{
+			return CreateScale(scales.X, scales.Y);
+		}
+
 		public static Transform Scale(Transform transform, float x, float y)
 		{
-			sfTransform_scale(&transform, x, y);
+			transform.Scale(x, y);
 			return transform;
 		}
 
-		public static Transform Scale(Transform transform, IReadOnlyVector2<float> scale)
+		public static Transform Scale(Transform transform, Vector2<float> scaling)
 		{
-			return Scale(transform, scale.X, scale.Y);
+			return Scale(transform, scaling.X, scaling.Y);
+		}
+
+		public void Scale(float x, float y, float centerX, float centerY)
+		{
+			fixed (Transform* this_ptr = &this)
+			{
+				sfTransform_scaleWithCenter(this_ptr, x, y, centerX, centerY);
+			}
+		}
+
+		public void Scale(Vector2<float> scales, float centerX, float centerY)
+		{
+			Scale(scales.X, scales.Y, centerX, centerY);
+		}
+
+		public void Scale(float x, float y, Vector2<float> center)
+		{
+			Scale(x, y, center.X, center.Y);
+		}
+
+		public void Scale(Vector2<float> scales, Vector2<float> center)
+		{
+			Scale(scales.X, scales.Y, center.X, center.Y);
 		}
 
 		public static Transform Scale(Transform transform, float x, float y, float centerX, float centerY)
 		{
-			sfTransform_scaleWithCenter(&transform, x, y, centerX, centerY);
+			transform.Scale(x, y, centerX, centerY);
 			return transform;
 		}
 
-		public static Transform Scale(Transform transform, IReadOnlyVector2<float> scale, float centerX, float centerY)
+		public static Transform Scale(Transform transform, Vector2<float> scale, float centerX, float centerY)
 		{
 			return Scale(transform, scale.X, scale.Y, centerX, centerY);
 		}
 
-		public static Transform Scale(Transform transform, float x, float y, IReadOnlyVector2<float> center)
+		public static Transform Scale(Transform transform, float x, float y, Vector2<float> center)
 		{
 			return Scale(transform, x, y, center.X, center.Y);
 		}
 
-		public static Transform Scale(Transform transform, IReadOnlyVector2<float> scale, IReadOnlyVector2<float> center)
+		public static Transform Scale(Transform transform, Vector2<float> scale, Vector2<float> center)
 		{
 			return Scale(transform, scale.X, scale.Y, center.X, center.Y);
 		}
 
+		public static Transform CreateScale(float x, float y, float centerX, float centerY)
+		{
+			return Scale(Identity, x, y, centerX, centerY);
+		}
+
+		public static Transform CreateScale(Vector2<float> scales, float centerX, float centerY)
+		{
+			return CreateScale(scales.X, scales.Y, centerX, centerY);
+		}
+
+		public static Transform CreateScale(float x, float y, Vector2<float> center)
+		{
+			return CreateScale(x, y, center.X, center.Y);
+		}
+
+		public static Transform CreateScale(Vector2<float> scales, Vector2<float> center)
+		{
+			return CreateScale(scales.X, scales.Y, center.X, center.Y);
+		}
+
 		#endregion
 
-		#region Interface Method Implementations
+		#region Interface Methods
 
 		public void Deconstruct(
 			out float m00, out float m01, out float m02,
@@ -247,7 +436,27 @@ namespace SFML.Graphics
 			m20 = _matrix[6]; m21 = _matrix[7]; m22 = _matrix[8];
 		}
 
-		public class Enumerator : IEnumerator<float>
+		public Vector3<float> GetRow(int column)
+		{
+			if (column is < 0 or > 3)
+			{
+				throw new ArgumentOutOfRangeException(nameof(column));
+			}
+
+			return new(_matrix[column * 3], _matrix[(column * 3) + 1], _matrix[(column * 3) + 2]);
+		}
+
+		public Vector3<float> GetColumn(int row)
+		{
+			if (row is < 0 or > 3)
+			{
+				throw new ArgumentOutOfRangeException(nameof(row));
+			}
+
+			return new(_matrix[row], _matrix[row + (1 * 3)], _matrix[row + (2 * 3)]);
+		}
+
+		public sealed class Enumerator : IEnumerator<float>
 		{
 			private Transform _transform;
 			private int _i;
@@ -278,7 +487,7 @@ namespace SFML.Graphics
 				_i = default;
 			}
 
-			public void Dispose() { GC.SuppressFinalize(this); }
+			public void Dispose() { }
 		}
 
 		public Enumerator GetEnumerator()
@@ -488,10 +697,10 @@ namespace SFML.Graphics
 		private static extern Transform sfTransform_getInverse(Transform* transform);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfTransform_transformPoint(Transform* transform, Vector2F point);
+		private static extern Vector2<float> sfTransform_transformPoint(Transform* transform, Vector2<float> point);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfTransform_transformRect(Transform* transform, FloatRect rectangle);
+		private static extern Rect<float> sfTransform_transformRect(Transform* transform, Rect<float> rectangle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfTransform_combine(Transform* transform, Transform* other);
@@ -532,7 +741,7 @@ namespace SFML.Graphics
 			//	&& left.M22 == right.M22;
 
 			return left._matrix[0] == right._matrix[0]
-				&& left._matrix[4] == right._matrix[3]
+				&& left._matrix[4] == right._matrix[4]
 				&& left._matrix[8] == right._matrix[8]
 
 				&& left._matrix[1] == right._matrix[1]
@@ -558,7 +767,7 @@ namespace SFML.Graphics
 			//	|| left.M22 != right.M22;
 
 			return left._matrix[0] != right._matrix[0]
-				|| left._matrix[4] != right._matrix[3]
+				|| left._matrix[4] != right._matrix[4]
 				|| left._matrix[8] != right._matrix[8]
 
 				|| left._matrix[1] != right._matrix[1]
@@ -571,6 +780,7 @@ namespace SFML.Graphics
 				|| left._matrix[7] != right._matrix[7];
 		}
 
+		// Natively supported
 		public static Transform operator *(Transform left, Transform right)
 		{
 			return Combine(left, right);
@@ -580,28 +790,28 @@ namespace SFML.Graphics
 
 		#region Cast Operators
 
-		public static implicit operator (
-			float, float, float,
-			float, float, float,
-			float, float, float)
-			(Transform value)
-		{
-			return (
-				value._matrix[0], value._matrix[1], value._matrix[2],
-				value._matrix[3], value._matrix[4], value._matrix[5],
-				value._matrix[6], value._matrix[7], value._matrix[8]);
-		}
+		//public static implicit operator (
+		//	float, float, float,
+		//	float, float, float,
+		//	float, float, float)
+		//	(Transform value)
+		//{
+		//	return (
+		//		value._matrix[0], value._matrix[1], value._matrix[2],
+		//		value._matrix[3], value._matrix[4], value._matrix[5],
+		//		value._matrix[6], value._matrix[7], value._matrix[8]);
+		//}
 
-		public static implicit operator Transform((
-			float m00, float m01, float m02,
-			float m10, float m11, float m12,
-			float m20, float m21, float m22) value)
-		{
-			return new(
-				value.m00, value.m01, value.m02,
-				value.m10, value.m11, value.m12,
-				value.m20, value.m21, value.m22);
-		}
+		//public static implicit operator Transform((
+		//	float m00, float m01, float m02,
+		//	float m10, float m11, float m12,
+		//	float m20, float m21, float m22) value)
+		//{
+		//	return new(
+		//		value.m00, value.m01, value.m02,
+		//		value.m10, value.m11, value.m12,
+		//		value.m20, value.m21, value.m22);
+		//}
 
 		public static explicit operator Matrix4x4(Transform value)
 		{
@@ -613,6 +823,7 @@ namespace SFML.Graphics
 				m[12], m[13], m[14], m[15]);
 		}
 
+		//// Not supported.
 		//public static explicit operator Transform(Matrix4x4 value)
 		//{
 		//	return new(
@@ -621,6 +832,37 @@ namespace SFML.Graphics
 		//		value.M14, value.M24, value.M44);
 		//}
 
+		/*
+		 * Transforms are transposed. We need to
+		 * transpose it again for the 3x2 matrix.
+		 * 
+		 * From checking, the last column of the
+		 * transform never change due to the nature
+		 * of matrix transformation in 2D space.
+		 * 
+		 *      Transform                 Matrix3x2
+		 * +-----+-----+-----+       +-----+-----+     +
+		 * | M00 | M10 | M20 |       | M00 | M01 | {0} |
+		 * +-----+-----+-----+       +-----+-----+     +
+		 * | M01 | M11 | M21 |  ==>  | M10 | M11 | {0} |
+		 * +-----+-----+-----+       +-----+-----+     +
+		 * | {0} | {0} | {1} |       | M20 | M21 | {1} |
+		 * +-----+-----+-----+       +-----+-----+     +
+		 * 
+		 * And the other way around.
+		 * 
+		 *      Matrix3x2                 Transform
+		 * +-----+-----+     +       +-----+-----+-----+
+		 * | M11 | M12 | {0} |       | M11 | M21 | M31 |
+		 * +-----+-----+     +       +-----+-----+-----+
+		 * | M21 | M22 | {0} |  ==>  | M12 | M22 | M32 |
+		 * +-----+-----+     +       +-----+-----+-----+
+		 * | M31 | M32 | {1} |       | {0} | {0} | {1} |
+		 * +-----+-----+     +       +-----+-----+-----+
+		 * 
+		 * Good luck!
+		 * 
+		 */
 		public static explicit operator Matrix3x2(Transform value)
 		{
 			return new(

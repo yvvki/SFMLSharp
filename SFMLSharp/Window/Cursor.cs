@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 using SFML.System;
@@ -82,7 +83,7 @@ namespace SFML.Window
 		/// <remarks>
 		///   This constructor doesn't actually create the cursor;
 		///   initially the new instance is invalid and must not be used until
-		///   either <see cref="TryLoadFromPixels(ReadOnlySpan{byte}, Vector2U, Vector2U)"/>
+		///   either <see cref="TryLoadFromPixels(ReadOnlySpan{byte}, Vector2<uint>, Vector2<uint>)"/>
 		///   or <see cref="TryLoadFromSystem(CursorType)"/> is called
 		///   and successfully created a cursor.
 		/// </remarks>
@@ -120,20 +121,20 @@ namespace SFML.Window
 		///     black if the RGB channel are close to zero, and white otherwise.
 		///   </para>
 		/// </remarks>
-		internal static Cursor FromPixels(byte* pixels, Vector2U size, Vector2U hotspot = default)
+		internal static Cursor FromPixels(byte* pixels, Vector2<uint> size, Vector2<uint> hotspot = default)
 		{
 			Cursor cursor = new();
 
-			Debug.Assert(cursor.TryLoadFromPixels(pixels, size, hotspot));
+			Debug.Assert(cursor.TryLoadFromPixels(pixels, size, hotspot) is false);
 
 			return cursor;
 		}
 
-		/// <inheritdoc cref="FromPixels(byte*, Vector2U, Vector2U)"/>
-		public static Cursor FromPixels(ReadOnlySpan<byte> pixels, Vector2U size, Vector2U hotspot = default)
+		/// <inheritdoc cref="FromPixels(byte*, Vector2<uint>, Vector2<uint>)"/>
+		public static Cursor FromPixels(ReadOnlySpan<byte> pixels, Vector2<uint> size, Vector2<uint> hotspot = default)
 		{
 			if (pixels.IsEmpty) throw new ArgumentException("Pixels is empty.", nameof(pixels));
-			if ((uint)pixels.Length != size.X * size.Y) throw new ArgumentException("Pixels length does not match size parameter.", nameof(pixels));
+			if ((uint)pixels.Length != (size.X * size.Y)) throw new ArgumentOutOfRangeException(nameof(pixels), pixels.Length, "Pixels length does not match size parameter.");
 
 			fixed (byte* pixels_ptr = pixels)
 			{
@@ -155,7 +156,7 @@ namespace SFML.Window
 		{
 			Cursor cursor = new();
 
-			if (cursor.TryLoadFromSystem(type)) throw new PlatformNotSupportedException($"Cursor of type {type} is not supported.");
+			if (cursor.TryLoadFromSystem(type) is false) throw new PlatformNotSupportedException($"Cursor of type {type} is not supported.");
 
 			return cursor;
 		}
@@ -178,25 +179,25 @@ namespace SFML.Window
 			return CheckAssignHandle(sfCursor_createFromSystem(type));
 		}
 
-		/// <inheritdoc cref="FromPixels(byte*, Vector2U, Vector2U)"/>
+		/// <inheritdoc cref="FromPixels(byte*, Vector2<uint>, Vector2<uint>)"/>
 		/// <returns>
 		///   <see langword="true" /> if the cursor was successfully loaded;
 		///   <see langword="false" /> otherwise.
 		/// </returns>
-		public bool TryLoadFromPixels(byte* pixels, Vector2U size, Vector2U hotspot = default)
+		internal bool TryLoadFromPixels(byte* pixels, Vector2<uint> size, Vector2<uint> hotspot = default)
 		{
 			return CheckAssignHandle(sfCursor_createFromPixels(pixels, size, hotspot));
 		}
 
-		/// <inheritdoc cref="TryLoadFromPixels(byte*, Vector2U, Vector2U)"/>
-		public bool TryLoadFromPixels(ReadOnlySpan<byte> pixels, Vector2U size, Vector2U hotspot = default)
+		/// <inheritdoc cref="TryLoadFromPixels(byte*, Vector2<uint>, Vector2<uint>)"/>
+		public bool TryLoadFromPixels(ReadOnlySpan<byte> pixels, Vector2<uint> size, Vector2<uint> hotspot = default)
 		{
-			//if (pixels.IsEmpty || pixels.Length != size.X * size.Y) return false;
+			//if (pixels.IsEmpty || pixels.Length != (size.X * size.Y)) return false;
 
 			fixed (byte* pixels_ptr = pixels) return TryLoadFromPixels(pixels_ptr, size, hotspot);
 		}
 
-		private bool CheckAssignHandle(Native* handle)
+		private bool CheckAssignHandle([NotNullWhen(true)] Native* handle)
 		{
 			if (handle is not null)
 			{
@@ -233,7 +234,7 @@ namespace SFML.Window
 		internal readonly struct Native { }
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Native* sfCursor_createFromPixels(byte* pixels, Vector2U size, Vector2U hotspot);
+		private static extern Native* sfCursor_createFromPixels(byte* pixels, Vector2<uint> size, Vector2<uint> hotspot);
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Native* sfCursor_createFromSystem(CursorType type);

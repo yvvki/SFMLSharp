@@ -79,7 +79,7 @@ namespace SFML.Window
 		///   (i.e. it will be ignored for windows created from the handle of a child window/control).
 		/// </remarks>
 		/// <value>Position of the window, in pixels.</value>
-		public Vector2I Position
+		public Vector2<int> Position
 		{
 			get => sfWindow_getPosition(Handle);
 			set => sfWindow_setPosition(Handle, value);
@@ -92,7 +92,7 @@ namespace SFML.Window
 		///   The size doesn't include the titlebar and borders of the window.
 		/// </remarks>
 		/// <value>Size of the window, in pixels</value>
-		public Vector2U Size
+		public Vector2<uint> Size
 		{
 			get => sfWindow_getSize(Handle);
 			set => sfWindow_setSize(Handle, value);
@@ -115,7 +115,7 @@ namespace SFML.Window
 		//{
 		//	set
 		//	{
-		//		Vector2U size = value.Size;
+		//		Vector2<uint> size = value.Size;
 		//		sfWindow_setIcon(Handle, size.X, size.Y, value.PixelsPtr);
 		//	}
 		//}
@@ -393,6 +393,7 @@ namespace SFML.Window
 			{
 				sfWindow_close(Handle);
 				sfWindow_destroy(Handle);
+				Handle = null;
 			}
 		}
 
@@ -481,7 +482,7 @@ namespace SFML.Window
 		}
 
 		/// <inheritdoc cref="SetIcon(uint, uint, ReadOnlySpan{byte})"/>
-		public void SetIcon(IReadOnlyVector2<uint> size, ReadOnlySpan<byte> pixels)
+		public void SetIcon(Vector2<uint> size, ReadOnlySpan<byte> pixels)
 		{
 			SetIcon(size.X, size.Y, pixels);
 		}
@@ -587,7 +588,7 @@ namespace SFML.Window
 
 		#endregion
 
-		#region Interface Method Implementations
+		#region Interface Methods
 
 		public void Dispose()
 		{
@@ -652,16 +653,16 @@ namespace SFML.Window
 		private static extern bool sfWindow_waitEvent(Native* window, out Event @event);
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2I sfWindow_getPosition(Native* window);
+		private static extern Vector2<int> sfWindow_getPosition(Native* window);
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfWindow_setPosition(Native* window, Vector2I position);
+		private static extern void sfWindow_setPosition(Native* window, Vector2<int> position);
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2U sfWindow_getSize(Native* window);
+		private static extern Vector2<uint> sfWindow_getSize(Native* window);
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfWindow_setSize(Native* window, Vector2U size);
+		private static extern void sfWindow_setSize(Native* window, Vector2<uint> size);
 
 		//[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
 		//private static extern void sfWindow_setTitle(Native* window, string title);

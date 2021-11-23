@@ -10,8 +10,8 @@ namespace SFML.Window
 		public static unsafe bool TryLoadFromPixels(
 			this Cursor @this,
 			Span<Color> pixels,
-			Vector2U size,
-			Vector2U hotspot = default)
+			Vector2<uint> size,
+			Vector2<uint> hotspot = default)
 		{
 			fixed (Color* pixels_ptr = pixels)
 			{
@@ -25,7 +25,7 @@ namespace SFML.Window
 		public static unsafe bool TryLoadFromPixels(
 			this Cursor @this,
 			Span2D<Color> pixels,
-			Vector2U hotspot = default)
+			Vector2<uint> hotspot = default)
 		{
 			fixed (Color* pixels_ptr = pixels)
 			{
@@ -36,7 +36,7 @@ namespace SFML.Window
 			}
 		}
 
-		public static unsafe bool TryLoadFromImage(this Cursor @this, Image image, Vector2U hotspot = default)
+		public static unsafe bool TryLoadFromImage(this Cursor @this, Image image, Vector2<uint> hotspot = default)
 		{
 			return @this.TryLoadFromPixels(image.GetPixelsPointer(), image.Size, hotspot);
 		}

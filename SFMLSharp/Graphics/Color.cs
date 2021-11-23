@@ -1,16 +1,27 @@
 ﻿using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
+
+using SFML.System;
 
 namespace SFML.Graphics
 {
 	/// <summary>
 	///   Represents a struct for manipulating RGBA colors.
 	/// </summary>
-	public struct Color : IEquatable<Color>, IFormattable, IEnumerable<byte>
+	[Serializable]
+	public struct Color :
+		IEquatable<Color>,
+		IFormattable,
+		IEnumerable<byte>
 	{
-		#region Fields
+		#region Fields & Properties
+
+		internal const int Count = 4;
 
 		/// <summary>
 		///   Red component.
@@ -28,6 +39,12 @@ namespace SFML.Graphics
 		///   Alpha (opacity) component.
 		/// </summary>
 		public byte A;
+
+		public byte this[int index]
+		{
+			get => GetElement(this, index);
+			set => this = WithElement(this, index, value);
+		}
 
 		#endregion
 
@@ -62,14 +79,6 @@ namespace SFML.Graphics
 			A = a;
 		}
 
-		public Color(uint value)
-			: this(
-				r: (byte)(value >> 24),
-				g: (byte)(value >> 16),
-				b: (byte)(value >> 8),
-				a: (byte)value)
-		{ }
-
 		public Color(
 			byte r,
 			byte g,
@@ -77,29 +86,45 @@ namespace SFML.Graphics
 
 		public Color(byte value) : this(value, value, value) { }
 
-		public Color() : this(default(byte)) { }
+		public Color() : this(byte.MinValue) { } // Black
 
-		public Color(IEnumerable<byte> color)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Color FromInterger(uint value)
 		{
-			IEnumerator<byte> enumerator = color.GetEnumerator();
+			return new(
+				r: (byte)(value >> 24),
+				g: (byte)(value >> 16),
+				b: (byte)(value >> 8),
+				a: (byte)value);
+		}
 
-			R = enumerator.Current;
-			if (!enumerator.MoveNext()) ThrowErrLess();
-			G = enumerator.Current;
-			if (!enumerator.MoveNext()) ThrowErrLess();
-			B = enumerator.Current;
-			if (!enumerator.MoveNext()) ThrowErrLess();
-			A = enumerator.Current;
+		#endregion
 
-			static void ThrowErrLess() => throw new ArgumentOutOfRangeException(
-					  nameof(color),
-					  "Enumerable contains less than 4 items.");
+		#region Static Methods
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Color Add(Color left, Color right)
+		{
+			return left + right;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Color Subtract(Color left, Color right)
+		{
+			return left - right;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Color Modulate(Color left, Color right)
+		{
+			return left * right;
 		}
 
 		#endregion
 
 		#region Methods
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public uint ToInterger()
 		{
 			return
@@ -109,21 +134,49 @@ namespace SFML.Graphics
 				A;
 		}
 
-		public static Color Add(Color left, Color right)
+		#endregion
+
+		#region Interface Methods
+
+		public static byte GetElement(Color color, int index)
 		{
-			return left + right;
+			if ((uint)index is >= Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
+			return GetElementUnsafe(ref color, index);
 		}
 
-		public static Color Subtract(Color left, Color right)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static byte GetElementUnsafe(ref Color color, int index)
 		{
-			return left - right;
+			Debug.Assert(index is >= 0 and < Count);
+			return Unsafe.Add(ref Unsafe.As<Color, byte>(ref color), index);
 		}
 
-		public static Color Modulate(Color left, Color right)
+		internal static Color WithElement(Color color, int index, byte value)
 		{
-			return left * right;
+			if ((uint)index is >= Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
+			Color result = color;
+
+			SetElementUnsafe(ref result, index, value);
+
+			return result;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static void SetElementUnsafe(ref Color color, int index, byte value)
+		{
+			Debug.Assert(index is >= 0 and < Count);
+			Unsafe.Add(ref Unsafe.As<Color, byte>(ref color), index) = value;
+		}
+
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public void Deconstruct(out byte r, out byte g, out byte b, out byte a)
 		{
 			r = R;
@@ -131,11 +184,6 @@ namespace SFML.Graphics
 			b = B;
 			a = A;
 		}
-
-		#endregion
-
-		#region Interface Method Implementations
-
 		public bool Equals(Color other)
 		{
 			return
@@ -145,6 +193,7 @@ namespace SFML.Graphics
 				A.Equals(other.A);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override bool Equals([NotNullWhen(true)] object? obj)
 		{
 			return obj is Color color && Equals(color);
@@ -177,17 +226,57 @@ namespace SFML.Graphics
 			return sb.ToString();
 		}
 
-		public IEnumerator<byte> GetEnumerator()
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public Enumerator GetEnumerator()
 		{
-			yield return R;
-			yield return G;
-			yield return B;
-			yield return A;
+			return new(this);
+		}
+
+		IEnumerator<byte> IEnumerable<byte>.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		public class Enumerator : IEnumerator<byte>
+		{
+			private Color _color;
+			private int _index;
+
+			public byte Current => _color[_index];
+			object IEnumerator.Current => Current;
+
+			public Enumerator(in Color value)
+			{
+				_color = value;
+			}
+
+			public bool MoveNext()
+			{
+				if (_index < Count)
+				{
+					_index++;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			public void Reset()
+			{
+				_index = default;
+			}
+
+			public void Dispose()
+			{
+				GC.SuppressFinalize(this);
+			}
 		}
 
 		#endregion
@@ -241,25 +330,15 @@ namespace SFML.Graphics
 
 		#region Cast Operators
 
-		public static implicit operator (byte, byte, byte, byte)(Color value)
-		{
-			return (value.R, value.G, value.B, value.A);
-		}
+		//public static implicit operator (byte, byte, byte, byte)(Color value)
+		//{
+		//	return (value.R, value.G, value.B, value.A);
+		//}
 
-		public static implicit operator Color((byte r, byte g, byte b, byte a) value)
-		{
-			return new(value.r, value.g, value.b, value.a);
-		}
-
-		public static explicit operator global::System.Drawing.Color(Color value)
-		{
-			return global::System.Drawing.Color.FromArgb(value.A, value.R, value.G, value.B);
-		}
-
-		public static explicit operator Color(global::System.Drawing.Color value)
-		{
-			return new(value.R, value.G, value.B, value.A);
-		}
+		//public static implicit operator Color((byte r, byte g, byte b, byte a) value)
+		//{
+		//	return new(value.r, value.g, value.b, value.a);
+		//}
 
 		#endregion
 	}

@@ -46,7 +46,7 @@ namespace SFML.Graphics
 
 		#region Properties
 
-		public Vector2F Position
+		public Vector2<float> Position
 		{
 			get => sfText_getPosition(Handle);
 			set => sfText_setPosition(Handle, value);
@@ -56,12 +56,12 @@ namespace SFML.Graphics
 			get => sfText_getRotation(Handle);
 			set => sfText_setRotation(Handle, value);
 		}
-		public Vector2F Scaling
+		public Vector2<float> Scaling
 		{
 			get => sfText_getScale(Handle);
 			set => sfText_setScale(Handle, value);
 		}
-		public Vector2F Origin
+		public Vector2<float> Origin
 		{
 			get => sfText_getOrigin(Handle);
 			set => sfText_setOrigin(Handle, value);
@@ -166,7 +166,7 @@ namespace SFML.Graphics
 
 		#region Methods
 
-		public Vector2F FindCharacterPosition(int index)
+		public Vector2<float> FindCharacterPosition(int index)
 		{
 			return sfText_findCharacterPos(Handle, (nuint)index);
 		}
@@ -191,9 +191,9 @@ namespace SFML.Graphics
 
 		#endregion
 
-		#region Interface Method Implementations
+		#region Interface Methods
 
-		public void Move(Vector2F offset)
+		public void Move(Vector2<float> offset)
 		{
 			sfText_move(Handle, offset);
 		}
@@ -203,7 +203,7 @@ namespace SFML.Graphics
 			sfText_rotate(Handle, angle);
 		}
 
-		public void Scale(Vector2F factor)
+		public void Scale(Vector2<float> factor)
 		{
 			sfText_scale(Handle, factor);
 		}
@@ -218,12 +218,12 @@ namespace SFML.Graphics
 			return sfText_getInverseTransform(Handle);
 		}
 
-		public FloatRect GetLocalBounds()
+		public Rect<float> GetLocalBounds()
 		{
 			return sfText_getLocalBounds(Handle);
 		}
 
-		public FloatRect GetGlobalBounds()
+		public Rect<float> GetGlobalBounds()
 		{
 			return sfText_getGlobalBounds(Handle);
 		}
@@ -272,37 +272,37 @@ namespace SFML.Graphics
 		private static extern void sfText_destroy(Native* text);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfText_setPosition(Native* text, Vector2F position);
+		private static extern void sfText_setPosition(Native* text, Vector2<float> position);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfText_setRotation(Native* text, float angle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfText_setScale(Native* text, Vector2F scale);
+		private static extern void sfText_setScale(Native* text, Vector2<float> scale);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfText_setOrigin(Native* text, Vector2F origin);
+		private static extern void sfText_setOrigin(Native* text, Vector2<float> origin);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfText_getPosition(Native* text);
+		private static extern Vector2<float> sfText_getPosition(Native* text);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern float sfText_getRotation(Native* text);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfText_getScale(Native* text);
+		private static extern Vector2<float> sfText_getScale(Native* text);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfText_getOrigin(Native* text);
+		private static extern Vector2<float> sfText_getOrigin(Native* text);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfText_move(Native* text, Vector2F offset);
+		private static extern void sfText_move(Native* text, Vector2<float> offset);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfText_rotate(Native* text, float angle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfText_scale(Native* text, Vector2F factors);
+		private static extern void sfText_scale(Native* text, Vector2<float> factors);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Transform sfText_getTransform(Native* text);
@@ -377,13 +377,13 @@ namespace SFML.Graphics
 		private static extern float sfText_getOutlineThickness(Native* text);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfText_findCharacterPos(Native* text, nuint index);
+		private static extern Vector2<float> sfText_findCharacterPos(Native* text, nuint index);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfText_getLocalBounds(Native* text);
+		private static extern Rect<float> sfText_getLocalBounds(Native* text);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfText_getGlobalBounds(Native* text);
+		private static extern Rect<float> sfText_getGlobalBounds(Native* text);
 
 		#endregion
 	}

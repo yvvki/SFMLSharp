@@ -18,7 +18,7 @@ namespace SFML.Graphics
 			set => sfCircleShape_setPointCount(Handle, (nuint)value);
 		}
 
-		public Vector2F this[int index] => GetPoint(index);
+		public Vector2<float> this[int index] => GetPoint(index);
 
 		protected override bool IsFixedSize => true;
 
@@ -28,7 +28,7 @@ namespace SFML.Graphics
 			set => sfCircleShape_setRadius(Handle, value);
 		}
 
-		public override Vector2F Position
+		public override Vector2<float> Position
 		{
 			get => sfCircleShape_getPosition(Handle);
 			set => sfCircleShape_setPosition(Handle, value);
@@ -38,12 +38,12 @@ namespace SFML.Graphics
 			get => sfCircleShape_getRotation(Handle);
 			set => sfCircleShape_setRotation(Handle, value);
 		}
-		public override Vector2F Scaling
+		public override Vector2<float> Scaling
 		{
 			get => sfCircleShape_getScale(Handle);
 			set => sfCircleShape_setScale(Handle, value);
 		}
-		public override Vector2F Origin
+		public override Vector2<float> Origin
 		{
 			get => sfCircleShape_getOrigin(Handle);
 			set => sfCircleShape_setOrigin(Handle, value);
@@ -66,7 +66,7 @@ namespace SFML.Graphics
 				sfCircleShape_setTexture(Handle, value!.Handle, false);
 			}
 		}
-		public override IntRect TextureRect
+		public override Rect<int> TextureRect
 		{
 			get => sfCircleShape_getTextureRect(Handle);
 			set => sfCircleShape_setTextureRect(Handle, value);
@@ -115,12 +115,12 @@ namespace SFML.Graphics
 			return sfCircleShape_getPointCount(Handle);
 		}
 
-		protected override Vector2F GetPoint(int index)
+		protected override Vector2<float> GetPoint(int index)
 		{
 			return GetPointNuint((nuint)index);
 		}
 
-		private protected override Vector2F GetPointNuint(nuint index)
+		private protected override Vector2<float> GetPointNuint(nuint index)
 		{
 			return sfCircleShape_getPoint(Handle, index);
 		}
@@ -140,9 +140,9 @@ namespace SFML.Graphics
 
 		#endregion
 
-		#region Interface Method Implementations
+		#region Interface Methods
 
-		public override void Move(Vector2F offset)
+		public override void Move(Vector2<float> offset)
 		{
 			sfCircleShape_move(Handle, offset);
 		}
@@ -152,7 +152,7 @@ namespace SFML.Graphics
 			sfCircleShape_rotate(Handle, angle);
 		}
 
-		public override void Scale(Vector2F factor)
+		public override void Scale(Vector2<float> factor)
 		{
 			sfCircleShape_scale(Handle, factor);
 		}
@@ -167,12 +167,12 @@ namespace SFML.Graphics
 			return sfCircleShape_getInverseTransform(Handle);
 		}
 
-		public override FloatRect GetLocalBounds()
+		public override Rect<float> GetLocalBounds()
 		{
 			return sfCircleShape_getLocalBounds(Handle);
 		}
 
-		public override FloatRect GetGlobalBounds()
+		public override Rect<float> GetGlobalBounds()
 		{
 			return sfCircleShape_getGlobalBounds(Handle);
 		}
@@ -206,37 +206,37 @@ namespace SFML.Graphics
 		private static extern void sfCircleShape_destroy(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfCircleShape_setPosition(Native* shape, Vector2F position);
+		private static extern void sfCircleShape_setPosition(Native* shape, Vector2<float> position);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfCircleShape_setRotation(Native* shape, float angle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfCircleShape_setScale(Native* shape, Vector2F scale);
+		private static extern void sfCircleShape_setScale(Native* shape, Vector2<float> scale);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfCircleShape_setOrigin(Native* shape, Vector2F origin);
+		private static extern void sfCircleShape_setOrigin(Native* shape, Vector2<float> origin);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfCircleShape_getPosition(Native* shape);
+		private static extern Vector2<float> sfCircleShape_getPosition(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern float sfCircleShape_getRotation(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfCircleShape_getScale(Native* shape);
+		private static extern Vector2<float> sfCircleShape_getScale(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfCircleShape_getOrigin(Native* shape);
+		private static extern Vector2<float> sfCircleShape_getOrigin(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfCircleShape_move(Native* shape, Vector2F offset);
+		private static extern void sfCircleShape_move(Native* shape, Vector2<float> offset);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfCircleShape_rotate(Native* shape, float angle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfCircleShape_scale(Native* shape, Vector2F factors);
+		private static extern void sfCircleShape_scale(Native* shape, Vector2<float> factors);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Transform sfCircleShape_getTransform(Native* shape);
@@ -248,7 +248,7 @@ namespace SFML.Graphics
 		private static extern void sfCircleShape_setTexture(Native* shape, Texture.Native* texture, bool resetRect);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfCircleShape_setTextureRect(Native* shape, IntRect rect);
+		private static extern void sfCircleShape_setTextureRect(Native* shape, Rect<int> rect);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfCircleShape_setFillColor(Native* shape, Color color);
@@ -263,7 +263,7 @@ namespace SFML.Graphics
 		private static extern Texture.Native* sfCircleShape_getTexture(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern IntRect sfCircleShape_getTextureRect(Native* shape);
+		private static extern Rect<int> sfCircleShape_getTextureRect(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Color sfCircleShape_getFillColor(Native* shape);
@@ -278,7 +278,7 @@ namespace SFML.Graphics
 		private static extern nuint sfCircleShape_getPointCount(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfCircleShape_getPoint(Native* shape, nuint index);
+		private static extern Vector2<float> sfCircleShape_getPoint(Native* shape, nuint index);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfCircleShape_setRadius(Native* shape, float size);
@@ -290,10 +290,10 @@ namespace SFML.Graphics
 		private static extern void sfCircleShape_setPointCount(Native* shape, nuint count);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfCircleShape_getLocalBounds(Native* shape);
+		private static extern Rect<float> sfCircleShape_getLocalBounds(Native* shape);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfCircleShape_getGlobalBounds(Native* shape);
+		private static extern Rect<float> sfCircleShape_getGlobalBounds(Native* shape);
 
 		#endregion
 	}

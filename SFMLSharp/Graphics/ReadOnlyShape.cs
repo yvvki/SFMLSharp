@@ -18,18 +18,18 @@ namespace SFML.Graphics
 			throw new InvalidOperationException("Shape is read-only.");
 		}
 
-		protected sealed override void SetPoint(int index, Vector2F value)
+		protected sealed override void SetPoint(int index, Vector2<float> value)
 		{
 			ThrowReadOnly();
 		}
 
-		protected sealed override int AddPoint(Vector2F point)
+		protected sealed override int AddPoint(Vector2<float> point)
 		{
 			ThrowReadOnly();
 			return default;
 		}
 
-		protected sealed override void InsertPoint(int index, Vector2F point)
+		protected sealed override void InsertPoint(int index, Vector2<float> point)
 		{
 			ThrowReadOnly();
 		}
@@ -39,7 +39,7 @@ namespace SFML.Graphics
 			ThrowReadOnly();
 		}
 
-		protected sealed override bool RemovePoint(Vector2F point)
+		protected sealed override bool RemovePoint(Vector2<float> point)
 		{
 			ThrowReadOnly();
 			return default;

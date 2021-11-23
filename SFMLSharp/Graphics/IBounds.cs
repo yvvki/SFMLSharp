@@ -2,7 +2,7 @@
 {
 	public interface IBounds : ITransformable
 	{
-		public FloatRect GetLocalBounds();
-		public FloatRect GetGlobalBounds();
+		public Rect<float> GetLocalBounds();
+		public Rect<float> GetGlobalBounds();
 	}
 }

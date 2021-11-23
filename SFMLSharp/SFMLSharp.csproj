@@ -18,40 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Graphics\RectImpl.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>RectImpl.cs</LastGenOutput>
-    </None>
-    <None Update="System\Vector3Impl.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Vector3Impl.cs</LastGenOutput>
-    </None>
-    <None Update="System\Vector2Impl.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Vector2Impl.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Graphics\RectImpl.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>RectImpl.tt</DependentUpon>
-    </Compile>
-    <Compile Update="System\Vector2Impl.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Vector2Impl.tt</DependentUpon>
-    </Compile>
-    <Compile Update="System\Vector3Impl.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Vector3Impl.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
   
 </Project>

@@ -1,40 +1,46 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SFML.System
 {
 	/// <summary>
-	///   Represents a vector with two <typeparamref name="T" /> number values.
+	///   Represents a vector with four <typeparamref name="T" /> number values.
 	/// </summary>
 	/// <typeparam name="T">The type of the vector.</typeparam>
 	[RequiresPreviewFeatures]
 	[Serializable]
-	public struct Vector2<T> :
-		IVectorOperators<Vector2<T>, T>,
-		IMultiplyOperators<Vector2<T>, T, Vector2<T>>,
-		IDivisionOperators<Vector2<T>, T, Vector2<T>>,
+	public struct Vector4<T> :
+		IVectorOperators<Vector4<T>, T>,
+		IMultiplyOperators<Vector4<T>, T, Vector4<T>>,
+		IDivisionOperators<Vector4<T>, T, Vector4<T>>,
 		IFormattable,
 		IEnumerable<T>
 		where T : INumber<T>
 	{
 		#region Fields & Properties
 
-		internal const int Count = 2;
+		internal const int Count = 4;
 
-		/// <summary>
-		///   The X component of the vector.
-		/// </summary>
+		/// <inheritdoc cref="Vector2{T}.X"/>
 		public T X;
-		/// <summary>
-		///   The Y component of the vector.
-		/// </summary>
+		/// <inheritdoc cref="Vector2{T}.Y"/>
 		public T Y;
+		/// <inheritdoc cref="Vector3{T}.Y"/>
+		public T Z;
+		/// <summary>
+		///   The W component of the vector.
+		/// </summary>
+		public T W;
 
 		public T this[int index]
 		{
@@ -46,63 +52,80 @@ namespace SFML.System
 
 		#region Static Properties
 
-		public static Vector2<T> Zero => new(T.Zero);
-		public static Vector2<T> UnitX => new(T.One, T.Zero);
-		public static Vector2<T> UnitY => new(T.Zero, T.One);
-		public static Vector2<T> One => new(T.One);
+		public static Vector4<T> Zero => new(T.Zero);
+		public static Vector4<T> UnitX => new(T.One, T.Zero, T.Zero, T.Zero);
+		public static Vector4<T> UnitY => new(T.Zero, T.One, T.Zero, T.Zero);
+		public static Vector4<T> UnitZ => new(T.Zero, T.Zero, T.One, T.Zero);
+		public static Vector4<T> UnitW => new(T.Zero, T.Zero, T.Zero, T.One);
+		public static Vector4<T> One => new(T.One);
 
-		public static Vector2<T> AdditiveIdentity => new(T.AdditiveIdentity);
-		public static Vector2<T> MultiplicativeIdentity => new(T.MultiplicativeIdentity);
+		public static Vector4<T> AdditiveIdentity => new(T.AdditiveIdentity);
+		public static Vector4<T> MultiplicativeIdentity => new(T.MultiplicativeIdentity);
 
 		#endregion
 
 		#region Constructors
 
-		/// <include file='Vector.xml' path='doc/vector[@name="Constructs1"]'/>
-		public Vector2(T value) : this(value, value) { }
+		/// <inheritdoc cref="Vector2{T}.Vector2(T)"/>
+		public Vector4(T value) : this(value, value, value, value) { }
 
-		/// <include file='Vector.xml' path='doc/vector[@name="Constructs2"]'/>
-		public Vector2(T x, T y)
+		/// <summary>
+		///   Construct a new vector from a 3-component value and another component.
+		/// </summary>
+		/// <param name="value">The value for the X, Y, and Z component.</param>
+		/// <param name="z">The value for the W component.</param>
+		public Vector4(Vector3<T> value, T w) : this(value.X, value.Y, value.Z, w) { }
+
+		/// <summary>
+		///   Constructs a new vector from 4 components.
+		/// </summary>
+		/// <param name="x">The value for the X component.</param>
+		/// <param name="y">The value for the Y component.</param>
+		/// <param name="z">The value for the Z component.</param>
+		/// <param name="w">The value for the W component.</param>
+		public Vector4(T x, T y, T z, T w)
 		{
 			X = x;
 			Y = y;
+			Z = z;
+			W = w;
 		}
 
 		#endregion
 
 		#region Static Methods
 
-		/// <inheritdoc cref="operator -(Vector2{T})"/>
+		/// <inheritdoc cref="operator -(Vector4{T})"/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> Negate(Vector2<T> value)
+		public static Vector4<T> Negate(Vector4<T> value)
 		{
 			return -value;
 		}
 
-		/// <inheritdoc cref="operator +(Vector2{T}, Vector2{T})"/>
+		/// <inheritdoc cref="operator +(Vector4{T}, Vector4{T})"/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> Add(Vector2<T> left, Vector2<T> right)
+		public static Vector4<T> Add(Vector4<T> left, Vector4<T> right)
 		{
 			return left + right;
 		}
 
-		/// <inheritdoc cref="operator -(Vector2{T}, Vector2{T})"/>
+		/// <inheritdoc cref="operator -(Vector4{T}, Vector4{T})"/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> Subtract(Vector2<T> left, Vector2<T> right)
+		public static Vector4<T> Subtract(Vector4<T> left, Vector4<T> right)
 		{
 			return left - right;
 		}
 
-		/// <inheritdoc cref="operator *(Vector2{T}, Vector2{T})"/>
+		/// <inheritdoc cref="operator *(Vector4{T}, Vector4{T})"/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> Multiply(Vector2<T> left, Vector2<T> right)
+		public static Vector4<T> Multiply(Vector4<T> left, Vector4<T> right)
 		{
 			return left * right;
 		}
 
-		/// <inheritdoc cref="operator /(Vector2{T}, Vector2{T})"/>
+		/// <inheritdoc cref="operator /(Vector4{T}, Vector4{T})"/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> Divide(Vector2<T> left, Vector2<T> right)
+		public static Vector4<T> Divide(Vector4<T> left, Vector4<T> right)
 		{
 			return left / right;
 		}
@@ -133,12 +156,12 @@ namespace SFML.System
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static unsafe Span<T> GetSpanUnsafe(ref Vector2<T> vector)
+		internal static unsafe Span<T> GetSpanUnsafe(ref Vector4<T> vector)
 		{
 			return new(Unsafe.AsPointer(ref vector), Count);
 		}
 
-		public static T GetElement(Vector2<T> vector, int index)
+		public static T GetElement(Vector4<T> vector, int index)
 		{
 			if ((uint)index is >= Count)
 			{
@@ -149,20 +172,20 @@ namespace SFML.System
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static T GetElementUnsafe(ref Vector2<T> vector, int index)
+		private static T GetElementUnsafe(ref Vector4<T> vector, int index)
 		{
 			Debug.Assert(index is >= 0 and < Count);
-			return Unsafe.Add(ref Unsafe.As<Vector2<T>, T>(ref vector), index);
+			return Unsafe.Add(ref Unsafe.As<Vector4<T>, T>(ref vector), index);
 		}
 
-		internal static Vector2<T> WithElement(Vector2<T> vector, int index, T value)
+		internal static Vector4<T> WithElement(Vector4<T> vector, int index, T value)
 		{
 			if ((uint)index is >= Count)
 			{
 				throw new IndexOutOfRangeException();
 			}
 
-			Vector2<T> result = vector;
+			Vector4<T> result = vector;
 
 			SetElementUnsafe(ref result, index, value);
 
@@ -170,34 +193,38 @@ namespace SFML.System
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static void SetElementUnsafe(ref Vector2<T> vector, int index, T value)
+		internal static void SetElementUnsafe(ref Vector4<T> vector, int index, T value)
 		{
 			Debug.Assert(index is >= 0 and < Count);
-			Unsafe.Add(ref Unsafe.As<Vector2<T>, T>(ref vector), index) = value;
+			Unsafe.Add(ref Unsafe.As<Vector4<T>, T>(ref vector), index) = value;
 		}
 
 		[EditorBrowsable(EditorBrowsableState.Never)]
-		public void Deconstruct(out T x, out T y)
+		public void Deconstruct(out T x, out T y, out T z, out T w)
 		{
 			x = X;
 			y = Y;
+			z = Z;
+			w = W;
 		}
 
-		public bool Equals(Vector2<T> other)
+		public bool Equals(Vector4<T> other)
 		{
 			return X.Equals(other.X)
-				&& Y.Equals(other.Y);
+				&& Y.Equals(other.Y)
+				&& Z.Equals(other.Z)
+				&& W.Equals(other.W);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override bool Equals([NotNullWhen(true)] object? obj)
 		{
-			return obj is Vector2<T> other && Equals(other);
+			return obj is Vector4<T> other && Equals(other);
 		}
 
 		public override int GetHashCode()
 		{
-			return HashCode.Combine(X, Y);
+			return HashCode.Combine(X, Y, Z, W);
 		}
 
 		public string ToString(string? format, IFormatProvider? formatProvider)
@@ -210,6 +237,12 @@ namespace SFML.System
 			sb.Append(separator);
 			sb.Append(' ');
 			sb.Append(Y.ToString(format, formatProvider));
+			sb.Append(separator);
+			sb.Append(' ');
+			sb.Append(Z.ToString(format, formatProvider));
+			sb.Append(separator);
+			sb.Append(' ');
+			sb.Append(W.ToString(format, formatProvider));
 			sb.Append('>');
 
 			return sb.ToString();
@@ -233,11 +266,11 @@ namespace SFML.System
 
 		public class Enumerator : IEnumerator<T>
 		{
-			private readonly Vector2<T> _vector;
+			private readonly Vector4<T> _vector;
 
 			private int _index;
 
-			public Enumerator(in Vector2<T> value)
+			public Enumerator(in Vector4<T> value)
 			{
 				_vector = value;
 			}
@@ -274,101 +307,106 @@ namespace SFML.System
 		#region Operators
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool operator ==(Vector2<T> left, Vector2<T> right)
+		public static bool operator ==(Vector4<T> left, Vector4<T> right)
 		{
 			return left.X == right.X
-				&& left.Y == right.Y;
+				&& left.Y == right.Y
+				&& left.Z == right.Z
+				&& left.W == right.W;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool operator !=(Vector2<T> left, Vector2<T> right)
+		public static bool operator !=(Vector4<T> left, Vector4<T> right)
 		{
 			return left.X != right.X
-				|| left.Y != right.Y;
+				|| left.Y != right.Y
+				|| left.Z != right.Z
+				|| left.W != right.W;
 		}
 
 		/// <include file='Vector.xml' path='doc/vector[@name="Negate"]'/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> operator -(Vector2<T> value)
+		public static Vector4<T> operator -(Vector4<T> value)
 		{
 			return new(
 				-value.X,
-				-value.Y);
+				-value.Y,
+				-value.Z,
+				-value.W);
 		}
 
 		/// <include file='Vector.xml' path='doc/vector[@name="Add"]'/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> operator +(Vector2<T> left, Vector2<T> right)
+		public static Vector4<T> operator +(Vector4<T> left, Vector4<T> right)
 		{
 			return new(
 				left.X + right.X,
-				left.Y + right.Y);
+				left.Y + right.Y,
+				left.Z + right.Z,
+				left.W + right.W);
 		}
 
 		/// <include file='Vector.xml' path='doc/vector[@name="Subtract"]'/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> operator -(Vector2<T> left, Vector2<T> right)
+		public static Vector4<T> operator -(Vector4<T> left, Vector4<T> right)
 		{
 			return new(
 				left.X - right.X,
-				left.Y - right.Y);
+				left.Y - right.Y,
+				left.Z - right.Z,
+				left.W - right.W);
 		}
 
 		/// <include file='Vector.xml' path='doc/vector[@name="Multiply"]'/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> operator *(Vector2<T> left, Vector2<T> right)
+		public static Vector4<T> operator *(Vector4<T> left, Vector4<T> right)
 		{
 			return new(
 				left.X * right.X,
-				left.Y * right.Y);
+				left.Y * right.Y,
+				left.Z * right.Z,
+				left.W * right.W);
 		}
 
 		/// <include file='Vector.xml' path='doc/vector[@name="Multiply"]'/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> operator *(Vector2<T> left, T right)
+		public static Vector4<T> operator *(Vector4<T> left, T right)
 		{
 			return new(
 				left.X * right,
-				left.Y * right);
+				left.Y * right,
+				left.Z * right,
+				left.W * right);
 		}
 
 		/// <include file='Vector.xml' path='doc/vector[@name="Multiply"]'/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> operator *(T left, Vector2<T> right)
+		public static Vector4<T> operator *(T left, Vector4<T> right)
 		{
 			return right * left;
 		}
 
 		/// <include file='Vector.xml' path='doc/vector[@name="Divide"]'/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> operator /(Vector2<T> left, Vector2<T> right)
+		public static Vector4<T> operator /(Vector4<T> left, Vector4<T> right)
 		{
 			return new(
 				left.X / right.X,
-				left.Y / right.Y);
+				left.Y / right.Y,
+				left.Z / right.Z,
+				left.W / right.W);
 		}
 
 		/// <include file='Vector.xml' path='doc/vector[@name="Divide"]'/>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Vector2<T> operator /(Vector2<T> left, T right)
+		public static Vector4<T> operator /(Vector4<T> left, T right)
 		{
 			return new(
 				left.X / right,
-				left.Y / right);
+				left.Y / right,
+				left.Z / right,
+				left.W / right);
 		}
-
-		#endregion
-
-		#region Cast Operators
-
-		//public static implicit operator (T, T)(Vector2<T> value)
-		//{
-		//	return (value.X, value.Y);
-		//}
-		//public static implicit operator Vector2<T>((T x, T y) value)
-		//{
-		//	return new(value.x, value.y);
-		//}
 
 		#endregion
 	}

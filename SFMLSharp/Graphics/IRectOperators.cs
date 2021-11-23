@@ -3,7 +3,7 @@
 namespace SFML.Graphics
 {
 	[RequiresPreviewFeatures]
-	public interface IRectOperators<TSelf, TNumber> :
+	internal interface IRectOperators<TSelf, TNumber> :
 		IEqualityOperators<TSelf, TSelf>
 		where TSelf : IRectOperators<TSelf, TNumber>
 		where TNumber : INumber<TNumber>

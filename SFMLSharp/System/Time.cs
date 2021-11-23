@@ -61,7 +61,28 @@ namespace SFML.System
 
 		#endregion
 
-		#region Interface Method Implementations
+		#region Static Methods
+
+		public static Time Min(Time left, Time right)
+		{
+			return left <= right ? left : right;
+		}
+
+		public static Time Max(Time left, Time right)
+		{
+			return left >= right ? left : right;
+		}
+
+		public static Time Clamp(Time value, Time min, Time max)
+		{
+			if (max < min) throw new ArgumentOutOfRangeException(nameof(max));
+
+			return value >= min ? value <= max ? value : max : min;
+		}
+
+		#endregion
+
+		#region Interface Methods
 
 		public int CompareTo(Time other)
 		{

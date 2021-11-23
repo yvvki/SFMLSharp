@@ -19,13 +19,13 @@ namespace SFML.Graphics
 
 		#region Properties
 
-		public Vector2U Size => sfImage_getSize(Handle);
+		public Vector2<uint> Size => sfImage_getSize(Handle);
 
 		internal int Length
 		{
 			get
 			{
-				Vector2U size = Size;
+				Vector2<uint> size = Size;
 				return (int)(size.X * size.Y);
 			}
 		}
@@ -45,7 +45,7 @@ namespace SFML.Graphics
 			set => sfImage_setPixel(Handle, x, y, value);
 		}
 
-		public Color this[IReadOnlyVector2<uint> index]
+		public Color this[Vector2<uint> index]
 		{
 			get => this[index.X, index.Y];
 			set => this[index.X, index.Y] = value;
@@ -65,12 +65,12 @@ namespace SFML.Graphics
 		public Image(uint width, uint height)
 			: this(sfImage_create(width, height)) { }
 
-		public Image(IReadOnlyVector2<uint> size) : this(size.X, size.Y) { }
+		public Image(Vector2<uint> size) : this(size.X, size.Y) { }
 
 		public Image(uint width, uint height, Color color)
 			: this(sfImage_createFromColor(width, height, color)) { }
 
-		public Image(IReadOnlyVector2<uint> size, Color color) : this(size.X, size.Y, color) { }
+		public Image(Vector2<uint> size, Color color) : this(size.X, size.Y, color) { }
 
 		public static Image FromFile(string filename)
 		{
@@ -147,13 +147,13 @@ namespace SFML.Graphics
 
 		public Span<byte> GetPixelsByte()
 		{
-			Vector2U size = Size;
+			Vector2<uint> size = Size;
 			return new(GetPixelsPointer(), (int)(size.X * size.Y * sizeof(Color)));
 		}
 
 		public Span<Color> GetPixels()
 		{
-			Vector2U size = Size;
+			Vector2<uint> size = Size;
 			return new(GetPixelsPointer(), (int)(size.X * size.Y));
 		}
 
@@ -167,12 +167,12 @@ namespace SFML.Graphics
 			sfImage_createMaskFromColor(Handle, color, alpha);
 		}
 
-		public void CopyImage(Image source, uint destX, uint destY, IntRect sourceRect, bool applyAlpha = true)
+		public void CopyImage(Image source, uint destX, uint destY, Rect<int> sourceRect, bool applyAlpha = true)
 		{
 			sfImage_copyImage(Handle, source.Handle, destX, destY, sourceRect, applyAlpha);
 		}
 
-		public void CopyImage(Image source, IReadOnlyVector2<uint> dest, IntRect sourceRect, bool applyAlpha = true)
+		public void CopyImage(Image source, Vector2<uint> dest, Rect<int> sourceRect, bool applyAlpha = true)
 		{
 			sfImage_copyImage(Handle, source.Handle, dest.X, dest.Y, sourceRect, applyAlpha);
 		}
@@ -189,7 +189,7 @@ namespace SFML.Graphics
 
 		#endregion
 
-		#region Interface Method Implementations
+		#region Interface Methods
 
 		[DoesNotReturn]
 		private static void ThrowFixed()
@@ -374,7 +374,7 @@ namespace SFML.Graphics
 		private static extern bool sfImage_saveToFile(Native* image, string filename);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2U sfImage_getSize(Native* image);
+		private static extern Vector2<uint> sfImage_getSize(Native* image);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfImage_createMaskFromColor(Native* image, Color color, byte alpha);
@@ -385,7 +385,7 @@ namespace SFML.Graphics
 			Native* source,
 			uint destX,
 			uint destY,
-			IntRect sourceRect,
+			Rect<int> sourceRect,
 			bool applyAlpha);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]

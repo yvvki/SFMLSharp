@@ -1,142 +1,65 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
+using System.Text;
 
 using SFML.System;
 
 namespace SFML.Graphics
 {
-	public interface IRect<TSelf, T> : IEquatable<IRect<TSelf, T>>, IFormattable
-		where TSelf : IRect<TSelf, T>
-		where T : IEquatable<T>, IFormattable
-	{
-		#region Properties
-
-		T Left { get; set; }
-
-		T Top { get; set; }
-
-		T Width { get; set; }
-
-		T Height { get; set; }
-
-		IReadOnlyVector2<T> Position { get; set; }
-
-		IReadOnlyVector2<T> Size { get; set; }
-
-		#endregion
-
-		#region Methods
-
-		TSelf GetNormalized();
-
-		bool Contains(T x, T y);
-
-		bool Contains(IReadOnlyVector2<T> point);
-
-		bool Intersects(TSelf rectangle, out TSelf intersection);
-
-		#endregion
-
-		#region Explicit Method Implementations
-
-		bool IEquatable<IRect<TSelf, T>>.Equals([NotNullWhen(true)] IRect<TSelf, T>? other)
-		{
-			return other is not null
-				&& Left.Equals(other.Left)
-				&& Top.Equals(other.Top)
-				&& Width.Equals(other.Width)
-				&& Height.Equals(other.Height);
-		}
-
-		#endregion
-	}
-
-	public interface IReadOnlyRect<out T>
-	{
-		#region Properties
-
-		T Left { get; }
-
-		T Top { get; }
-
-		T Width { get; }
-
-		T Height { get; }
-
-		IReadOnlyVector2<T> Position { get; }
-
-		IReadOnlyVector2<T> Size { get; }
-
-		#endregion
-	}
-
 	[RequiresPreviewFeatures]
+	[Serializable]
 	public struct Rect<T> :
-		IRect<Rect<T>, T>,
-		IReadOnlyRect<T>,
+		IRectOperators<Rect<T>, T>,
 		IEquatable<Rect<T>>,
 		IFormattable,
-		IRectOperators<Rect<T>, T>
+		IEnumerable<Vector2<T>>
 		where T : INumber<T>
 	{
 		#region Fields & Properties
+
+		internal const int Count = 4;
 
 		public T Left;
 		public T Top;
 		public T Width;
 		public T Height;
 
-		T IRect<Rect<T>, T>.Left { get => Left; set => Left = value; }
-		T IRect<Rect<T>, T>.Top { get => Top; set => Top = value; }
-		T IRect<Rect<T>, T>.Width { get => Width; set => Width = value; }
-		T IRect<Rect<T>, T>.Height { get => Height; set => Height = value; }
-
-		T IReadOnlyRect<T>.Left => Left;
-		T IReadOnlyRect<T>.Top => Top;
-		T IReadOnlyRect<T>.Width => Width;
-		T IReadOnlyRect<T>.Height => Height;
-
 		public Vector2<T> Position
 		{
-			get => new(Left, Top);
-			set
-			{
-				Left = value.X;
-				Top = value.Y;
-			}
+			get => GetVector2(this, 0);
+			set => this = WithVector2(this, 0, value);
 		}
+
 		public Vector2<T> Size
 		{
-			get => new(Width, Height);
-			set
-			{
-				Width = value.X;
-				Height = value.Y;
-			}
+			get => GetVector2(this, 1);
+			set => this = WithVector2(this, 1, value);
 		}
 
-		IReadOnlyVector2<T> IRect<Rect<T>, T>.Position
+		public T this[int index]
 		{
-			get => Position;
-			set => Position = new(value);
+			get => GetElement(this, index);
+			set => this = WithElement(this, index, value);
 		}
-		IReadOnlyVector2<T> IRect<Rect<T>, T>.Size
-		{
-			get => Size;
-			set => Size = new(value);
-		}
-
-		IReadOnlyVector2<T> IReadOnlyRect<T>.Position => Position;
-		IReadOnlyVector2<T> IReadOnlyRect<T>.Size => Size;
 
 		#endregion
 
 		#region Constructors
 
-		public Rect(IReadOnlyRect<T> value) : this(value.Left, value.Top, value.Width, value.Height) { }
-
-		public Rect(IReadOnlyVector2<T> position, IReadOnlyVector2<T> size)
-			: this(position.X, position.Y, size.X, size.Y) { }
+		public Rect(Vector2<T> position, Vector2<T> size)
+			: this(
+				position.X,
+				position.Y,
+				size.X,
+				size.Y) { }
 
 		public Rect(T left, T top, T width, T height)
 		{
@@ -148,59 +71,53 @@ namespace SFML.Graphics
 
 		#endregion
 
-		#region Interface Methods Implementations
+		#region Static Methods
 
-		public Rect<T> GetNormalized()
+
+
+		#endregion
+
+		#region Methods
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Rect<T> Normalize(in Rect<T> rect)
 		{
-			if (Size == default) return this;
+			Rect<T> result = rect;
 
-			T left;
-			T top;
-			T width;
-			T height;
-
-			if (Width < T.Zero)
+			if (result.Width < T.Zero)
 			{
-				left = Left - Width;
-				width = -Width;
-			}
-			else
-			{
-				left = Left;
-				width = Width;
+				result.Left -= result.Width;
+				result.Width = -result.Width;
 			}
 
-			if (Height < T.Zero)
+			if (result.Height < T.Zero)
 			{
-				top = Top - Height;
-				height = -Height;
-			}
-			else
-			{
-				top = Top;
-				height = Height;
+				result.Top -= result.Height;
+				result.Height = -result.Height;
 			}
 
-			return new(left, top, width, height);
+			return result;
 		}
 
 		public bool Contains(T x, T y)
 		{
-			Rect<T> r = GetNormalized();
+			Rect<T> r = Normalize(this);
 
-			return (r.Left <= x) && (x < r.Left + r.Width)
-				&& (r.Top <= y) && (y < r.Top + r.Height);
+			return (r.Left <= x)
+				&& (r.Top <= y)
+				&& (x < r.Left + r.Width)
+				&& (y < r.Top + r.Height);
 		}
 
-		public bool Contains(IReadOnlyVector2<T> point)
+		public bool Contains(Vector2<T> point)
 		{
 			return Contains(point.X, point.Y);
 		}
 
-		public bool Intersects(Rect<T> rectangle, out Rect<T> intersection)
+		public bool Intersects(Rect<T> rect, out Rect<T> intersection)
 		{
-			Rect<T> r1 = GetNormalized();
-			Rect<T> r2 = rectangle.GetNormalized();
+			Rect<T> r1 = Normalize(this);
+			Rect<T> r2 = Normalize(rect);
 
 			T interLeft = T.Max(r1.Left, r2.Left);
 			T interTop = T.Max(r1.Top, r2.Top);
@@ -219,6 +136,124 @@ namespace SFML.Graphics
 			}
 		}
 
+		#endregion
+
+		#region Interface Methods
+
+		public void CopyTo(Vector2<T>[] array, int index)
+		{
+			GetSpanUnsafe(ref this).ToArray().CopyTo(array, index);
+		}
+
+		public void CopyTo(Span<Vector2<T>> destination)
+		{
+			GetSpanUnsafe(ref this).CopyTo(destination);
+		}
+
+		public bool TryCopyTo(Span<Vector2<T>> destination)
+		{
+			return GetSpanUnsafe(ref this).TryCopyTo(destination);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static unsafe Span<Vector2<T>> GetSpanUnsafe(ref Rect<T> rect)
+		{
+			return new(Unsafe.AsPointer(ref rect), Count / Vector2<T>.Count);
+		}
+
+		public static Vector2<T> GetVector2(Rect<T> rect, int index)
+		{
+			if ((uint)index is >= Count / Vector2<T>.Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
+			return GetVector2Unsafe(ref rect, index);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static Vector2<T> GetVector2Unsafe(ref Rect<T> rect, int index)
+		{
+			Debug.Assert(index is >= 0 and < Count / Vector2<T>.Count);
+			return Unsafe.Add(ref Unsafe.As<Rect<T>, Vector2<T>>(ref rect), index / Vector2<T>.Count);
+		}
+
+		internal static Rect<T> WithVector2(Rect<T> rect, int index, Vector2<T> value)
+		{
+			if ((uint)index is >= Count / Vector2<T>.Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
+			Rect<T> result = rect;
+
+			SetVector2Unsafe(ref result, index, value);
+
+			return result;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static void SetVector2Unsafe(ref Rect<T> rect, int index, Vector2<T> value)
+		{
+			Debug.Assert(index is >= 0 and < Count);
+			Unsafe.Add(ref Unsafe.As<Rect<T>, Vector2<T>>(ref rect), index / Vector2<T>.Count) = value;
+		}
+
+		public static T GetElement(Rect<T> rect, int index)
+		{
+			if ((uint)index is >= Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
+			return GetElementUnsafe(ref rect, index);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static T GetElementUnsafe(ref Rect<T> rect, int index)
+		{
+			Debug.Assert(index is >= 0 and < Count);
+			return Unsafe.Add(ref Unsafe.As<Rect<T>, T>(ref rect), index);
+		}
+
+		internal static Rect<T> WithElement(Rect<T> rect, int index, T value)
+		{
+			if ((uint)index is >= Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
+			Rect<T> result = rect;
+
+			SetElementUnsafe(ref result, index, value);
+
+			return result;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static void SetElementUnsafe(ref Rect<T> vector, int index, T value)
+		{
+			Debug.Assert(index is >= 0 and < Count);
+			Unsafe.Add(ref Unsafe.As<Rect<T>, T>(ref vector), index) = value;
+		}
+
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		public void Deconstruct(out Vector2<T> position, out Vector2<T> size)
+		{
+			position = Position;
+			size = Size;
+		}
+
+		public void Deconstruct(
+			out T left, out T top,
+			out T width, out T height)
+		{
+			left = Left;
+			top = Top;
+			width = Width;
+			height = Height;
+		}
+
 		public bool Equals(Rect<T> other)
 		{
 			return Left.Equals(other.Left)
@@ -227,6 +262,7 @@ namespace SFML.Graphics
 				&& Height.Equals(other.Height);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override bool Equals([NotNullWhen(true)] object? obj)
 		{
 			return obj is Rect<T> other && Equals(other);
@@ -239,7 +275,75 @@ namespace SFML.Graphics
 
 		public string ToString(string? format, IFormatProvider? formatProvider)
 		{
-			return this.Format(format, formatProvider);
+			StringBuilder sb = new();
+			string separator = NumberFormatInfo.GetInstance(formatProvider).NumberGroupSeparator;
+
+			sb.Append('{');
+			sb.Append(' ');
+			sb.Append('<');
+			sb.Append(Left.ToString(format, formatProvider));
+			sb.Append(separator);
+			sb.Append(' ');
+			sb.Append(Top.ToString(format, formatProvider));
+			sb.Append('>');
+			sb.Append(separator);
+			sb.Append(' ');
+			sb.Append('<');
+			sb.Append(Width.ToString(format, formatProvider));
+			sb.Append(separator);
+			sb.Append(' ');
+			sb.Append(Height.ToString(format, formatProvider));
+			sb.Append('>');
+			sb.Append(' ');
+			sb.Append('}');
+
+			return sb.ToString();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public Enumerator GetEnumerator()
+		{
+			return new(this);
+		}
+
+		IEnumerator<Vector2<T>> IEnumerable<Vector2<T>>.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		public class Enumerator : IEnumerator<Vector2<T>>
+		{
+			private readonly Rect<T> _rect;
+
+			private bool _size;
+
+			public Enumerator(Rect<T> value)
+			{
+				_rect = value;
+			}
+
+			public Vector2<T> Current => _size ? _rect.Position : _rect.Size;
+			object? IEnumerator.Current => Current;
+
+			public bool MoveNext()
+			{
+				return _size == false && (_size = true);
+			}
+
+			public void Reset()
+			{
+				_size = false;
+			}
+
+			public void Dispose()
+			{
+				GC.SuppressFinalize(this);
+			}
 		}
 
 		#endregion
@@ -266,23 +370,23 @@ namespace SFML.Graphics
 
 		#region Cast Operators
 
-		public static implicit operator (Vector2<T>, Vector2<T>)(Rect<T> value)
-		{
-			return (value.Position, value.Size);
-		}
-		public static implicit operator Rect<T>((Vector2<T> position, Vector2<T> size) value)
-		{
-			return new(value.position, value.size);
-		}
+		//public static implicit operator (T, T, T, T)(Rect<T> value)
+		//{
+		//	return (value.Left, value.Top, value.Width, value.Height);
+		//}
+		//public static implicit operator Rect<T>((T left, T top, T width, T height) value)
+		//{
+		//	return new(value.left, value.top, value.width, value.height);
+		//}
 
-		public static implicit operator (T, T, T, T)(Rect<T> value)
-		{
-			return (value.Left, value.Top, value.Width, value.Height);
-		}
-		public static implicit operator Rect<T>((T left, T top, T width, T height) value)
-		{
-			return new(value.left, value.top, value.width, value.height);
-		}
+		//public static implicit operator (Vector2<T>, Vector2<T>)(Rect<T> value)
+		//{
+		//	return (value.Position, value.Size);
+		//}
+		//public static implicit operator Rect<T>((Vector2<T> position, Vector2<T> size) value)
+		//{
+		//	return new(value.position, value.size);
+		//}
 
 		#endregion
 	}

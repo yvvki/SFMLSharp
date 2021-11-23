@@ -19,12 +19,15 @@ namespace SFML.Graphics
 			}
 		}
 
-		public static void Update(this Texture @this, ReadOnlySpan2D<Color> pixels, IReadOnlyVector2<uint> offset)
+		public static void Update(this Texture @this, ReadOnlySpan2D<Color> pixels, Vector2<uint> offset)
 		{
+			uint x = offset.X;
+			uint y = offset.Y;
+
 			@this.Update(
 				pixels,
-				offset.X,
-				offset.Y);
+				x,
+				y);
 		}
 
 
@@ -36,12 +39,16 @@ namespace SFML.Graphics
 				y);
 		}
 
-		public static void Update(this Texture @this, Color[,] pixels, IReadOnlyVector2<uint> offset)
+		public static void Update(this Texture @this, Color[,] pixels, Vector2<uint> offset)
 		{
+			uint x = offset.X;
+			uint y = offset.Y;
+
+
 			@this.Update(
 				pixels,
-				offset.X,
-				offset.Y);
+				x,
+				y);
 		}
 	}
 }

@@ -9,13 +9,13 @@ namespace SFML.Graphics
 		View View { get; set; }
 		View DefaultView { get; }
 
-		IntRect Viewport { get; }
+		Rect<int> Viewport { get; }
 
-		Vector2F MapPixelToCoords(Vector2I point);
-		Vector2F MapPixelToCoords(Vector2I point, View view);
+		Vector2<float> MapPixelToCoords(Vector2<int> point);
+		Vector2<float> MapPixelToCoords(Vector2<int> point, View view);
 
-		Vector2I MapCoordsToPixel(Vector2F point);
-		Vector2I MapCoordsToPixel(Vector2F point, View view);
+		Vector2<int> MapCoordsToPixel(Vector2<float> point);
+		Vector2<int> MapCoordsToPixel(Vector2<float> point, View view);
 
 		void Draw(IDrawable drawable, RenderStates? states = null);
 

@@ -1,58 +1,87 @@
-﻿using System.Runtime.Versioning;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
+using SFML.System;
 
 namespace SFML.Graphics
 {
 	public static class RectExtensions
 	{
 		[RequiresPreviewFeatures]
-		public static T Right<T>(this IReadOnlyRect<T> value)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Right<T>(this in Rect<T> @this)
 			where T : INumber<T>
 		{
-			return value.Left + value.Width;
-		}
-
-		public static float Right(this IReadOnlyRect<float> value)
-		{
-			return value.Left + value.Width;
-		}
-
-		public static int Right(this IReadOnlyRect<int> value)
-		{
-			return value.Left + value.Width;
+			return @this.Left + @this.Width;
 		}
 
 		[RequiresPreviewFeatures]
-		public static T Bottom<T>(this IReadOnlyRect<T> value)
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static T Bottom<T>(this in Rect<T> @this)
 			where T : INumber<T>
 		{
-			return value.Top + value.Height;
-		}
-
-		public static float Bottom(this IReadOnlyRect<float> value)
-		{
-			return value.Top + value.Height;
-		}
-
-		public static int Bottom(this IReadOnlyRect<int> value)
-		{
-			return value.Top + value.Height;
+			return @this.Top + @this.Height;
 		}
 
 		[RequiresPreviewFeatures]
-		public static Rect<T> ToRect<T>(this IReadOnlyRect<T> value)
-			where T : INumber<T>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector4<float> ToGeneric(this Rect<float> @this)
 		{
-			return new(value);
+			Rect<float> value = @this;
+			return AsGeneric(ref value);
 		}
 
-		public static FloatRect ToRect(this IReadOnlyRect<float> value)
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector4<float> AsGeneric(ref Rect<float> value)
 		{
-			return new(value);
+			return Unsafe.As<Rect<float>, Vector4<float>>(ref value);
 		}
 
-		public static IntRect ToRect(this IReadOnlyRect<int> value)
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Rect<float> ToRect(this Vector4<float> @this)
 		{
-			return new(value);
+			Vector4<float> value = @this;
+			return AsRect(ref value);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Rect<float> AsRect(ref Vector4<float> value)
+		{
+			return Unsafe.As<Vector4<float>, Rect<float>>(ref value);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector4 ToVector(this Rect<float> @this)
+		{
+			Rect<float> value = @this;
+			return AsVector(ref value);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector4 AsVector(ref Rect<float> value)
+		{
+			return Unsafe.As<Rect<float>, Vector4>(ref value);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Rect<float> ToRect(this Vector4 @this)
+		{
+			Vector4 value = @this;
+			return AsRect(ref value);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Rect<float> AsRect(ref Vector4 value)
+		{
+			return Unsafe.As<Vector4, Rect<float>>(ref value);
 		}
 	}
 }

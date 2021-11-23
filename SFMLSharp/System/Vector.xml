@@ -26,18 +26,10 @@
 
   <vector name="Constructs3From2">
     <summary>
-      Construct a new vector from a 2-component value and another value.
+      Construct a new vector from a 2-component value and another component.
     </summary>
     <param name="value">The value for the X and Y component.</param>
     <param name="z">The value for the Z component.</param>
-  </vector>
-
-  <vector name="Constructs3With2">
-    <summary>
-      Construct a new vector from a value and another 2-component value.
-    </summary>
-    <param name="x">The value for the X component.</param>
-    <param name="value">The value for the Y and Z component.</param>
   </vector>
 
   <vector name="Negate">

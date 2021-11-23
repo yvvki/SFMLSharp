@@ -12,13 +12,13 @@ namespace SFML.Graphics
 
 		#region Properties
 
-		public Vector2F Center
+		public Vector2<float> Center
 		{
 			get => sfView_getCenter(Handle);
 			set => sfView_setCenter(Handle, value);
 		}
 
-		public Vector2F Size
+		public Vector2<float> Size
 		{
 			get => sfView_getSize(Handle);
 			set => sfView_setSize(Handle, value);
@@ -30,7 +30,7 @@ namespace SFML.Graphics
 			set => sfView_setRotation(Handle, value);
 		}
 
-		public FloatRect Viewport
+		public Rect<float> Viewport
 		{
 			get => sfView_getViewport(Handle);
 			set => sfView_setViewport(Handle, value);
@@ -45,7 +45,7 @@ namespace SFML.Graphics
 			Handle = sfView_create();
 		}
 
-		public View(FloatRect rectangle)
+		public View(Rect<float> rectangle)
 		{
 			Handle = sfView_createFromRect(rectangle);
 		}
@@ -59,12 +59,12 @@ namespace SFML.Graphics
 
 		#region Methods
 
-		public void Reset(FloatRect rectangle)
+		public void Reset(Rect<float> rectangle)
 		{
 			sfView_reset(Handle, rectangle);
 		}
 
-		public void Move(Vector2F offset)
+		public void Move(Vector2<float> offset)
 		{
 			sfView_move(Handle, offset);
 		}
@@ -81,7 +81,7 @@ namespace SFML.Graphics
 
 		#endregion
 
-		#region Interface Method Implementations
+		#region Interface Methods
 
 		/// <inheritdoc cref="ICloneable.Clone"/>
 		public View Clone()
@@ -109,7 +109,7 @@ namespace SFML.Graphics
 		private static extern Native* sfView_create();
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Native* sfView_createFromRect(FloatRect rectangle);
+		private static extern Native* sfView_createFromRect(Rect<float> rectangle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Native* sfView_copy(Native* view);
@@ -118,34 +118,34 @@ namespace SFML.Graphics
 		private static extern void sfView_destroy(Native* view);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfView_setCenter(Native* view, Vector2F center);
+		private static extern void sfView_setCenter(Native* view, Vector2<float> center);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfView_setSize(Native* view, Vector2F size);
+		private static extern void sfView_setSize(Native* view, Vector2<float> size);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfView_setRotation(Native* view, float angle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfView_setViewport(Native* view, FloatRect viewport);
+		private static extern void sfView_setViewport(Native* view, Rect<float> viewport);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfView_reset(Native* view, FloatRect rectangle);
+		private static extern void sfView_reset(Native* view, Rect<float> rectangle);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfView_getCenter(Native* view);
+		private static extern Vector2<float> sfView_getCenter(Native* view);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern Vector2F sfView_getSize(Native* view);
+		private static extern Vector2<float> sfView_getSize(Native* view);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern float sfView_getRotation(Native* view);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern FloatRect sfView_getViewport(Native* view);
+		private static extern Rect<float> sfView_getViewport(Native* view);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
-		private static extern void sfView_move(Native* view, Vector2F offset);
+		private static extern void sfView_move(Native* view, Vector2<float> offset);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfView_rotate(Native* view, float angle);

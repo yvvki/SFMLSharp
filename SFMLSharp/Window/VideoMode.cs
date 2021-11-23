@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
 using SFML.System;
@@ -17,7 +18,7 @@ namespace SFML.Window
 	public readonly unsafe record struct VideoMode(
 		uint Width,
 		uint Height,
-		uint BitsPerPixel = 32) : IReadOnlyVector2<uint>
+		uint BitsPerPixel = 32)
 	{
 		#region Fields & Properties
 
@@ -34,8 +35,12 @@ namespace SFML.Window
 		/// </value>
 		public bool IsValid => sfVideoMode_isValid(this);
 
-		uint IReadOnlyVector2<uint>.X => Width;
-		uint IReadOnlyVector2<uint>.Y => Height;
+		public Vector2<uint> Size
+		{
+			[RequiresPreviewFeatures]
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => new(Width, Height);
+		}
 
 		#endregion
 
@@ -46,7 +51,8 @@ namespace SFML.Window
 		/// </summary>
 		/// <param name="size">Width and height in pixels.</param>
 		/// <param name="bitsPerPixel">Pixel depths in bits per pixel.</param>
-		public VideoMode(IReadOnlyVector2<uint> size, uint bitsPerPixel = 32)
+		[RequiresPreviewFeatures]
+		public VideoMode(Vector2<uint> size, uint bitsPerPixel = 32)
 			: this(size.X, size.Y, bitsPerPixel) { }
 
 		#endregion
@@ -91,11 +97,6 @@ namespace SFML.Window
 
 		[RequiresPreviewFeatures]
 		public static explicit operator Vector2<uint>(VideoMode value)
-		{
-			return new(value.Width, value.Height);
-		}
-
-		public static explicit operator Vector2U(VideoMode value)
 		{
 			return new(value.Width, value.Height);
 		}
