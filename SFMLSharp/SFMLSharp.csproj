@@ -14,11 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSFML.Redist" Version="2.5.1" />
-    <PackageReference Include="System.Runtime.Experimental" Version="6.0.0-preview.7.21377.19" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <PackageReference Include="System.Runtime.Experimental" Version="6.0.2-mauipre.1.22054.8" />
   </ItemGroup>
   
 </Project>

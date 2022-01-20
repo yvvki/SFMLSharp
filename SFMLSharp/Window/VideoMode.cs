@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
 using SFML.System;
@@ -15,30 +14,17 @@ namespace SFML.Window
 	/// <param name="Width">Video mode width, in pixels.</param>
 	/// <param name="Height">Video mode height, in pixels.</param>
 	/// <param name="BitsPerPixel">Video mode pixel depth, in bits per pixels.</param>
+	[Serializable]
 	public readonly unsafe record struct VideoMode(
 		uint Width,
 		uint Height,
 		uint BitsPerPixel = 32)
 	{
-		#region Fields & Properties
-
-		/// <summary>
-		///   Tell whether or not a video mode is valid.
-		/// </summary>
-		/// <remarks>
-		///   The validity of video modes is only relevant when using fullscreen windows;
-		///   otherwise any video mode can be used with no restriction.
-		/// </remarks>
-		/// <value>
-		///   <see langword="true"/> if the video mode is valid for fullscreen mode;
-		///   <see langword="false"/> otherwise.
-		/// </value>
-		public bool IsValid => sfVideoMode_isValid(this);
+		#region Property
 
 		public Vector2<uint> Size
 		{
 			[RequiresPreviewFeatures]
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => new(Width, Height);
 		}
 
@@ -89,6 +75,22 @@ namespace SFML.Window
 			return new(
 				sfVideoMode_getFullscreenModes(out nuint count),
 				(int)count);
+		}
+
+		/// <summary>
+		///   Tell whether or not a video mode is valid.
+		/// </summary>
+		/// <remarks>
+		///   The validity of video modes is only relevant when using fullscreen windows;
+		///   otherwise any video mode can be used with no restriction.
+		/// </remarks>
+		/// <returns>
+		///   <see langword="true"/> if the video mode is valid for fullscreen mode;
+		///   <see langword="false"/> otherwise.
+		/// </returns>
+		public static bool IsValid(VideoMode mode)
+		{
+			return sfVideoMode_isValid(mode);
 		}
 
 		#endregion

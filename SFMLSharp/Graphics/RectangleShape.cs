@@ -185,7 +185,7 @@ namespace SFML.Graphics
 			return Clone();
 		}
 
-		private protected override void OnDispose()
+		private protected override void Destroy()
 		{
 			sfRectangleShape_destroy(Handle);
 		}

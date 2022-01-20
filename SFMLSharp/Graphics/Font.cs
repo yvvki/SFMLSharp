@@ -43,6 +43,8 @@ namespace SFML.Graphics
 
 		public Font() { }
 
+		// TODO: static create methods
+
 		public bool TryLoadFromFile(string filename)
 		{
 			Native* handle = sfFont_createFromFile(filename);
@@ -94,7 +96,11 @@ namespace SFML.Graphics
 			}
 		}
 
-		public Glyph GetGlyph(uint codePoint, uint characterSize, bool bold = default, float outlineThickness = default)
+		public Glyph GetGlyph(
+			uint codePoint,
+			uint characterSize,
+			bool bold = default,
+			float outlineThickness = default)
 		{
 			ThrowIfNotCreated();
 			return sfFont_getGlyph(Handle,
@@ -104,23 +110,33 @@ namespace SFML.Graphics
 				outlineThickness);
 		}
 
-		//public Glyph GetGlyph(string character, uint characterSize, bool bold, float outlineThickness)
-		//{
-		//	return GetGlyph(
-		//		 (uint)char.ConvertToUtf32(character, 0),
-		//		 characterSize,
-		//		 bold,
-		//		 outlineThickness);
-		//}
+		public Glyph GetGlyph(
+			string character,
+			int index,
+			uint characterSize,
+			bool bold = default,
+			float outlineThickness = default)
+		{
+			return GetGlyph(
+				 (uint)char.ConvertToUtf32(character, index),
+				 characterSize,
+				 bold,
+				 outlineThickness);
+		}
 
-		//public Glyph GetGlyph(char highSurrogate, char lowSurrogate, uint characterSize, bool bold, float outlineThickness)
-		//{
-		//	return GetGlyph(
-		//		 (uint)char.ConvertToUtf32(highSurrogate, lowSurrogate),
-		//		 characterSize,
-		//		 bold,
-		//		 outlineThickness);
-		//}
+		public Glyph GetGlyph(
+			char highSurrogate,
+			char lowSurrogate,
+			uint characterSize,
+			bool bold = default,
+			float outlineThickness = default)
+		{
+			return GetGlyph(
+				 (uint)char.ConvertToUtf32(highSurrogate, lowSurrogate),
+				 characterSize,
+				 bold,
+				 outlineThickness);
+		}
 
 		public float GetKerning(uint first, uint second, uint characterSize)
 		{

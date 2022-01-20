@@ -330,14 +330,19 @@ namespace SFML.Window
 			WindowStyle style = WindowStyle.Default,
 			ContextSettings? settings = null)
 		{
-			fixed (ContextSettings.Native* settings_ptr = settings)
+			ContextSettings.Native* settings_ptr = null;
+
+			if (settings is not null)
 			{
-				Handle = sfWindow_createUnicode(
-					mode,
-					UTF32Ptr.ToPointer(title),
-					style,
-					settings_ptr);
+				ContextSettings.Native settings_handle = ContextSettings.GetHandle(settings);
+				settings_ptr = &settings_handle;
 			}
+
+			Handle = sfWindow_createUnicode(
+				mode,
+				UTF32Ptr.ToPointer(title),
+				style,
+				settings_ptr);
 		}
 
 		/// <summary>
@@ -367,10 +372,15 @@ namespace SFML.Window
 		private protected virtual void OnCreate(IntPtr handle,
 			ContextSettings? settings = null)
 		{
-			fixed (ContextSettings.Native* settings_ptr = settings)
+			ContextSettings.Native* settings_ptr = null;
+
+			if (settings is not null)
 			{
-				Handle = sfWindow_createFromHandle(handle, settings_ptr);
+				ContextSettings.Native settings_handle = ContextSettings.GetHandle(settings);
+				settings_ptr = &settings_handle;
 			}
+
+			Handle = sfWindow_createFromHandle(handle, settings_ptr);
 		}
 
 		#endregion
@@ -393,6 +403,7 @@ namespace SFML.Window
 			{
 				sfWindow_close(Handle);
 				sfWindow_destroy(Handle);
+
 				Handle = null;
 			}
 		}

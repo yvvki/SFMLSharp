@@ -173,7 +173,7 @@ namespace SFML.Graphics
 		private static Vector2<T> GetVector2Unsafe(ref Rect<T> rect, int index)
 		{
 			Debug.Assert(index is >= 0 and < Count / Vector2<T>.Count);
-			return Unsafe.Add(ref Unsafe.As<Rect<T>, Vector2<T>>(ref rect), index / Vector2<T>.Count);
+			return Unsafe.Add(ref Unsafe.As<Rect<T>, Vector2<T>>(ref rect), index);
 		}
 
 		internal static Rect<T> WithVector2(Rect<T> rect, int index, Vector2<T> value)
@@ -194,7 +194,7 @@ namespace SFML.Graphics
 		internal static void SetVector2Unsafe(ref Rect<T> rect, int index, Vector2<T> value)
 		{
 			Debug.Assert(index is >= 0 and < Count);
-			Unsafe.Add(ref Unsafe.As<Rect<T>, Vector2<T>>(ref rect), index / Vector2<T>.Count) = value;
+			Unsafe.Add(ref Unsafe.As<Rect<T>, Vector2<T>>(ref rect), index) = value;
 		}
 
 		public static T GetElement(Rect<T> rect, int index)
@@ -242,6 +242,7 @@ namespace SFML.Graphics
 			size = Size;
 		}
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public void Deconstruct(
 			out T left, out T top,
 			out T width, out T height)
@@ -298,50 +299,14 @@ namespace SFML.Graphics
 			return sb.ToString();
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public Enumerator GetEnumerator()
+		public IEnumerator<Vector2<T>> GetEnumerator()
 		{
-			return new(this);
+			yield return Position;
+			yield return Size;
 		}
-
-		IEnumerator<Vector2<T>> IEnumerable<Vector2<T>>.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
-		}
-
-		public class Enumerator : IEnumerator<Vector2<T>>
-		{
-			private readonly Rect<T> _rect;
-
-			private bool _size;
-
-			public Enumerator(Rect<T> value)
-			{
-				_rect = value;
-			}
-
-			public Vector2<T> Current => _size ? _rect.Position : _rect.Size;
-			object? IEnumerator.Current => Current;
-
-			public bool MoveNext()
-			{
-				return _size == false && (_size = true);
-			}
-
-			public void Reset()
-			{
-				_size = false;
-			}
-
-			public void Dispose()
-			{
-				GC.SuppressFinalize(this);
-			}
 		}
 
 		#endregion

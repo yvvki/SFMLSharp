@@ -215,58 +215,14 @@ namespace SFML.System
 			return sb.ToString();
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public Enumerator GetEnumerator()
+		public IEnumerator<T> GetEnumerator()
 		{
-			return new(this);
+			yield return X;
+			yield return Y;
 		}
-
-		IEnumerator<T> IEnumerable<T>.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
-		}
-
-		public class Enumerator : IEnumerator<T>
-		{
-			private readonly Vector2<T> _vector;
-
-			private int _index;
-
-			public Enumerator(in Vector2<T> value)
-			{
-				_vector = value;
-			}
-
-			public T Current => _vector[_index];
-			object? IEnumerator.Current => Current;
-
-			public bool MoveNext()
-			{
-				if (_index < Count)
-				{
-					_index++;
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-
-			public void Reset()
-			{
-				_index = default;
-			}
-
-			public void Dispose()
-			{
-				GC.SuppressFinalize(this);
-			}
 		}
 
 		#endregion

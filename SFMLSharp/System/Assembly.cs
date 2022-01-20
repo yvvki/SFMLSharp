@@ -2,4 +2,4 @@
 using System.Runtime.Versioning;
 
 [assembly: RequiresPreviewFeatures]
-[assembly: InternalsVisibleTo("SFMLSharp.Extensions")]
+[assembly: InternalsVisibleTo("SFMLSharp.Extensions")] 

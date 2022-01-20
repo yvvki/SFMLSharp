@@ -95,5 +95,47 @@ namespace SFML.System
 		{
 			return Unsafe.As<Vector4, Vector4<float>>(ref value);
 		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector2<int> ToVectorInt(this Vector2<uint> @this)
+		{
+			return new((int)@this.X, (int)@this.Y);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector2<int> ToVectorInt(this Vector2<float> @this)
+		{
+			return new((int)@this.X, (int)@this.Y);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector2<uint> ToVectorUint(this Vector2<int> @this)
+		{
+			return new((uint)@this.X, (uint)@this.Y);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector2<uint> ToVectorUint(this Vector2<float> @this)
+		{
+			return new((uint)@this.X, (uint)@this.Y);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector2<float> ToVectorFloat(this Vector2<int> @this)
+		{
+			return new(@this.X, @this.Y);
+		}
+
+		[RequiresPreviewFeatures]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static Vector2<float> ToVectorFloat(this Vector2<uint> @this)
+		{
+			return new(@this.X, @this.Y);
+		}
 	}
 }

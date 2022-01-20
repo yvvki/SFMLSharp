@@ -42,7 +42,7 @@ namespace SFML.Graphics
 		ICloneable,
 		IDisposable
 	{
-		internal Native* Handle;
+		internal readonly Native* Handle;
 
 		#region Properties
 

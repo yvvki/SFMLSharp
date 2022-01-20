@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 
 using SFML.System;
 
+using static System.Net.Mime.MediaTypeNames;
 using static SFML.Graphics.DllName;
 
 namespace SFML.Graphics
@@ -76,7 +77,10 @@ namespace SFML.Graphics
 		{
 			Image image = new();
 
-			if (image.TryLoadFromFile(filename)) throw new FileNotFoundException("File could not be loaded", filename);
+			if (image.TryLoadFromFile(filename) is false)
+			{
+				throw new ArgumentException("Failed to load image", filename);
+			}
 
 			return image;
 		}
@@ -85,16 +89,27 @@ namespace SFML.Graphics
 		{
 			Image image = new();
 
-			image.TryLoadFromMemory(data);
+			if (image.TryLoadFromMemory(data) is false)
+			{
+				throw new ArgumentException("Failed to load image.", nameof(data));
+			}
 
 			return image;
 		}
 
 		public static Image FromStream(Stream stream)
 		{
+			if (stream is null)
+			{
+				throw new ArgumentNullException(nameof(stream));
+			}
+
 			Image image = new();
 
-			image.TryLoadFromStream(stream);
+			if (image.TryLoadFromStream(stream) is false)
+			{
+				throw new ArgumentException("Failed to load image", nameof(stream));
+			}
 
 			return image;
 		}
@@ -238,73 +253,22 @@ namespace SFML.Graphics
 			return GetPixels().GetEnumerator();
 		}
 
-		private class Enumerator : IEnumerator<Color>
+		IEnumerator<Color> GetEnumeratorUnsafe()
 		{
-			private readonly Image _image;
-			private uint _index = default;
+			Vector2<uint> size = Size;
 
-			public Color Current
+			for (uint y = 0; y < size.Y; y++)
 			{
-				get
+				for (uint x = 0; x < size.X; x++)
 				{
-					uint width = _image.Size.X;
-					return _image[_index % width, _index / width];
+					yield return this[x, y];
 				}
-			}
-
-			object IEnumerator.Current => Current;
-
-			public Enumerator(Image image)
-			{
-				_image = image;
-			}
-
-			public bool MoveNext()
-			{
-				if (_index < _image.Length)
-				{
-					_index++;
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-
-			public void Reset()
-			{
-				_index = default;
-			}
-
-
-			public void Dispose()
-			{
-				Dispose(disposing: true);
-				GC.SuppressFinalize(this);
-			}
-
-			private bool _disposed;
-			private void Dispose(bool disposing)
-			{
-				if (_disposed) return;
-
-				if (disposing) Reset();
-
-				_disposed = true;
 			}
 		}
-
-		private Enumerator GetEnumeratorUnsafe()
-		{
-			return new(this);
-		}
-
 		IEnumerator<Color> IEnumerable<Color>.GetEnumerator()
 		{
 			return GetEnumeratorUnsafe();
 		}
-
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumeratorUnsafe();

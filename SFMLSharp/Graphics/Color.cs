@@ -125,11 +125,13 @@ namespace SFML.Graphics
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public uint ToInterger()
 		{
-			return
-				(uint)(R << 24) |
-				(uint)(G << 16) |
-				(uint)(B << 8) |
-				A;
+			//return
+			//	(uint)(R << 24) |
+			//	(uint)(G << 16) |
+			//	(uint)(B << 8) |
+			//	A;
+
+			return Unsafe.As<Color, uint>(ref this);
 		}
 
 		#endregion
@@ -224,57 +226,16 @@ namespace SFML.Graphics
 			return sb.ToString();
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public Enumerator GetEnumerator()
+		public IEnumerator<byte> GetEnumerator()
 		{
-			return new(this);
+			yield return R;
+			yield return G;
+			yield return B;
+			yield return A;
 		}
-
-		IEnumerator<byte> IEnumerable<byte>.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
-		}
-
-		public class Enumerator : IEnumerator<byte>
-		{
-			private Color _color;
-			private int _index;
-
-			public byte Current => _color[_index];
-			object IEnumerator.Current => Current;
-
-			public Enumerator(in Color value)
-			{
-				_color = value;
-			}
-
-			public bool MoveNext()
-			{
-				if (_index < Count)
-				{
-					_index++;
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-
-			public void Reset()
-			{
-				_index = default;
-			}
-
-			public void Dispose()
-			{
-				GC.SuppressFinalize(this);
-			}
 		}
 
 		#endregion

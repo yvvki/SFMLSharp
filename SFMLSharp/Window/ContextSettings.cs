@@ -27,6 +27,7 @@ namespace SFML.Window
 	/// <param name="AttributeFlags">The attribute flags to create the context with.</param>
 	/// <param name="SRgbCapable">Whether the context framebuffer is sRGB capable.</param>
 	[StructLayout(LayoutKind.Sequential)]
+	[Serializable]
 	public record class ContextSettings(
 		uint DepthBits = 0,
 		uint StencilBits = 0,
@@ -38,19 +39,18 @@ namespace SFML.Window
 	{
 		public static readonly ContextSettings Default = new();
 
-		internal readonly Native Handle = new(
-				DepthBits,
-				StencilBits,
-				AntialiasingLevel,
-				MajorVersion,
-				MinorVersion,
-				(uint)AttributeFlags,
-				SRgbCapable);
-		internal ref Native GetPinnableReference()
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static Native GetHandle(ContextSettings contextSettings)
 		{
-			return ref Unsafe.AsRef(in Handle);
+			return new(
+				contextSettings.DepthBits,
+				contextSettings.StencilBits,
+				contextSettings.AntialiasingLevel,
+				contextSettings.MajorVersion,
+				contextSettings.MinorVersion,
+				(uint)contextSettings.AttributeFlags,
+				contextSettings.SRgbCapable);
 		}
-
 
 		internal struct Native
 		{

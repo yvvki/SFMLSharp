@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.HighPerformance;
+﻿using CommunityToolkit.HighPerformance;
 
 using SFML.System;
 

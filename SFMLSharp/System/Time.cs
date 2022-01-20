@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace SFML.System
 {
@@ -11,8 +12,8 @@ namespace SFML.System
 
 		private readonly long _microseconds; // Ticks
 
-		public const int TicksPerSecond = 1000000;
-		public const int TicksPerMillisecond = 1000;
+		internal const long TicksPerSecond = 1000000;
+		public const long TicksPerMillisecond = 1000;
 
 		/// <summary>
 		///   Returns the time value as number of seconds.
@@ -26,6 +27,7 @@ namespace SFML.System
 		/// </summary>
 		/// <seealso cref="Seconds" />
 		/// <seealso cref="Microseconds" />
+		// literally unuseable
 		public int Milliseconds => (int)(_microseconds / TicksPerMillisecond);
 
 		/// <summary>
@@ -44,16 +46,19 @@ namespace SFML.System
 			_microseconds = microseconds;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Time FromSeconds(float value)
 		{
 			return new((long)(value * TicksPerSecond));
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Time FromMilliseconds(int value)
 		{
-			return new((long)value * TicksPerSecond);
+			return new(value * TicksPerSecond);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Time FromMicroseconds(long value)
 		{
 			return new(value);
@@ -261,16 +266,16 @@ namespace SFML.System
 
 		#region Cast Operators
 
-		private const long _TimeSpanTicksRatio = TimeSpan.TicksPerMillisecond / TicksPerMillisecond;
+		internal const long TimeSpanTicksRatio = TimeSpan.TicksPerMillisecond / TicksPerMillisecond;
 
 		public static explicit operator TimeSpan(Time time)
 		{
-			return TimeSpan.FromTicks(time._microseconds * _TimeSpanTicksRatio);
+			return TimeSpan.FromTicks(time._microseconds * TimeSpanTicksRatio);
 		}
 
 		public static explicit operator Time(TimeSpan time)
 		{
-			return FromMicroseconds(time.Ticks / _TimeSpanTicksRatio);
+			return FromMicroseconds(time.Ticks / TimeSpanTicksRatio);
 		}
 
 		#endregion

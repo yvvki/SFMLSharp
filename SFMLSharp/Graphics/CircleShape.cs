@@ -187,7 +187,7 @@ namespace SFML.Graphics
 			return Clone();
 		}
 
-		private protected override void OnDispose()
+		private protected override void Destroy()
 		{
 			sfCircleShape_destroy(Handle);
 		}

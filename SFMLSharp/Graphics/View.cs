@@ -8,7 +8,7 @@ namespace SFML.Graphics
 {
 	public unsafe class View : ICloneable
 	{
-		internal Native* Handle;
+		internal readonly Native* Handle;
 
 		#region Properties
 

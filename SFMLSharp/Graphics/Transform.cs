@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -10,6 +11,7 @@ using static SFML.Graphics.DllName;
 
 namespace SFML.Graphics
 {
+	// A transposed 3x3 matrix.
 	public unsafe struct Transform :
 		IList,
 		IList<float>,
@@ -19,7 +21,7 @@ namespace SFML.Graphics
 	{
 		#region Fields & Properties
 
-		internal const int FixedLength = 9;
+		internal const int FixedLength = 3 * 3;
 
 		public static int Length => FixedLength;
 
@@ -41,12 +43,12 @@ namespace SFML.Graphics
 			{
 				if (row is < 0 or > 3)
 				{
-					throw new ArgumentOutOfRangeException(nameof(row));
+					throw new IndexOutOfRangeException();
 				}
 
 				if (column is < 0 or > 3)
 				{
-					throw new ArgumentOutOfRangeException(nameof(column));
+					throw new IndexOutOfRangeException();
 				}
 
 				return _matrix[row + (column * 3)];
@@ -55,12 +57,12 @@ namespace SFML.Graphics
 			{
 				if (row is < 0 or > 3)
 				{
-					throw new ArgumentOutOfRangeException(nameof(row));
+					throw new IndexOutOfRangeException();
 				}
 
 				if (column is < 0 or > 3)
 				{
-					throw new ArgumentOutOfRangeException(nameof(column));
+					throw new IndexOutOfRangeException();
 				}
 
 				_matrix[row + (column * 3)] = value;
@@ -73,7 +75,7 @@ namespace SFML.Graphics
 			{
 				if (index is < 0 or > FixedLength)
 				{
-					throw new ArgumentOutOfRangeException(nameof(index));
+					throw new IndexOutOfRangeException();
 				}
 
 				return _matrix[index];
@@ -82,7 +84,7 @@ namespace SFML.Graphics
 			{
 				if (index is < 0 or > FixedLength)
 				{
-					throw new ArgumentOutOfRangeException(nameof(index));
+					throw new IndexOutOfRangeException();
 				}
 
 				_matrix[index] = value;
@@ -99,7 +101,7 @@ namespace SFML.Graphics
 		object? IList.this[int index]
 		{
 			get => this[index];
-			set => this[index] = (float)value!;
+			set => this[index] = (float)value!; // automatically throws
 		}
 
 		int ICollection.Count => Length;
@@ -121,6 +123,7 @@ namespace SFML.Graphics
 
 		#region Constructors
 
+		// Identity
 		public Transform() : this(
 			1, 0, 0,
 			0, 1, 0,
@@ -137,34 +140,48 @@ namespace SFML.Graphics
 			_matrix[6] = m20; _matrix[7] = m21; _matrix[8] = m22;
 		}
 
-		public Transform(IEnumerable<float> matrix)
+		public Transform(Span<float> matrix)
 		{
-			if (matrix is null) throw new ArgumentNullException(nameof(matrix));
+			if (matrix.Length is < FixedLength) throw new ArgumentOutOfRangeException(nameof(matrix));
 
-			IEnumerator<float> enumerator = matrix.GetEnumerator();
-
-			_matrix[0] = enumerator.Current;
-			if (enumerator.MoveNext() is false) ThrowErr();
-			_matrix[1] = enumerator.Current;
-			if (enumerator.MoveNext() is false) ThrowErr();
-			_matrix[2] = enumerator.Current;
-			if (enumerator.MoveNext() is false) ThrowErr();
-			_matrix[3] = enumerator.Current;
-			if (enumerator.MoveNext() is false) ThrowErr();
-			_matrix[4] = enumerator.Current;
-			if (enumerator.MoveNext() is false) ThrowErr();
-			_matrix[5] = enumerator.Current;
-			if (enumerator.MoveNext() is false) ThrowErr();
-			_matrix[6] = enumerator.Current;
-			if (enumerator.MoveNext() is false) ThrowErr();
-			_matrix[7] = enumerator.Current;
-			if (enumerator.MoveNext() is false) ThrowErr();
-			_matrix[8] = enumerator.Current;
-			if (enumerator.MoveNext() is true) ThrowErr();
-
-			[DoesNotReturn]
-			static void ThrowErr() => throw new ArgumentOutOfRangeException(nameof(matrix), "Enumerable does not contains 9 items.");
+			fixed (float* matrix_ptr = matrix, this_matrix_ptr = _matrix)
+			{
+				Buffer.MemoryCopy(
+					matrix_ptr,
+					this_matrix_ptr,
+					FixedLength * sizeof(float),
+					FixedLength * sizeof(float));
+			}
 		}
+
+		//public Transform(IEnumerable<float> matrix)
+		//{
+		//	if (matrix is null) throw new ArgumentNullException(nameof(matrix));
+
+		//	IEnumerator<float> enumerator = matrix.GetEnumerator();
+
+		//	_matrix[0] = enumerator.Current;
+		//	if (enumerator.MoveNext() is false) ThrowErr();
+		//	_matrix[1] = enumerator.Current;
+		//	if (enumerator.MoveNext() is false) ThrowErr();
+		//	_matrix[2] = enumerator.Current;
+		//	if (enumerator.MoveNext() is false) ThrowErr();
+		//	_matrix[3] = enumerator.Current;
+		//	if (enumerator.MoveNext() is false) ThrowErr();
+		//	_matrix[4] = enumerator.Current;
+		//	if (enumerator.MoveNext() is false) ThrowErr();
+		//	_matrix[5] = enumerator.Current;
+		//	if (enumerator.MoveNext() is false) ThrowErr();
+		//	_matrix[6] = enumerator.Current;
+		//	if (enumerator.MoveNext() is false) ThrowErr();
+		//	_matrix[7] = enumerator.Current;
+		//	if (enumerator.MoveNext() is false) ThrowErr();
+		//	_matrix[8] = enumerator.Current;
+		//	if (enumerator.MoveNext() is true) ThrowErr();
+
+		//	[DoesNotReturn]
+		//	static void ThrowErr() => throw new ArgumentOutOfRangeException(nameof(matrix), "Enumerable does not contains 9 items.");
+		//}
 
 		#endregion
 
@@ -172,9 +189,9 @@ namespace SFML.Graphics
 
 		public Span<float> AsSpan()
 		{
-			fixed (float* matrix_ptr = _matrix)
+			fixed (float* this_matrix_ptr = _matrix)
 			{
-				return new(matrix_ptr, FixedLength);
+				return new(this_matrix_ptr, FixedLength);
 			}
 		}
 
@@ -186,21 +203,19 @@ namespace SFML.Graphics
 			}
 		}
 
-		private float* GetMatrixPtr()
+		private float[] GetMatrix()
 		{
-			float* matrix = stackalloc float[16];
+			float[] matrix = new float[16];
 
 			fixed (Transform* this_ptr = &this)
 			{
-				sfTransform_getMatrix(this_ptr, matrix);
+				fixed (float* matrix_ptr = matrix)
+				{
+					sfTransform_getMatrix(this_ptr, matrix_ptr);
+				}
 			}
 
 			return matrix;
-		}
-
-		public Span<float> GetMatrix()
-		{
-			return new(GetMatrixPtr(), 16);
 		}
 
 		public Vector2<float> TransformPoint(Vector2<float> point)
@@ -440,6 +455,12 @@ namespace SFML.Graphics
 			}
 
 			return new(_matrix[column * 3], _matrix[(column * 3) + 1], _matrix[(column * 3) + 2]);
+
+			// Possible faster method? 
+			//fixed (float* this_matrix_ptr = _matrix)
+			//{
+			//	return Unsafe.As<float, Vector3<float>>(ref Unsafe.AsRef<float>(this_matrix_ptr + (column * 3)));
+			//}
 		}
 
 		public Vector3<float> GetColumn(int row)
@@ -452,50 +473,18 @@ namespace SFML.Graphics
 			return new(_matrix[row], _matrix[row + (1 * 3)], _matrix[row + (2 * 3)]);
 		}
 
-		public sealed class Enumerator : IEnumerator<float>
+		public IEnumerator<float> GetEnumerator()
 		{
-			private Transform _transform;
-			private int _i;
-
-			public float Current => _transform._matrix[_i];
-			object IEnumerator.Current => Current;
-
-			public Enumerator(in Transform transform)
-			{
-				_transform = transform;
-			}
-
-			public bool MoveNext()
-			{
-				if (_i < FixedLength)
-				{
-					_i++;
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-
-			public void Reset()
-			{
-				_i = default;
-			}
-
-			public void Dispose() { }
+			yield return M00;
+			yield return M01;
+			yield return M02;
+			yield return M10;
+			yield return M11;
+			yield return M12;
+			yield return M20;
+			yield return M21;
+			yield return M22;
 		}
-
-		public Enumerator GetEnumerator()
-		{
-			return new(this);
-		}
-
-		IEnumerator<float> IEnumerable<float>.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
@@ -811,7 +800,7 @@ namespace SFML.Graphics
 
 		public static explicit operator Matrix4x4(Transform value)
 		{
-			float* m = value.GetMatrixPtr();
+			float[] m = value.GetMatrix();
 			return new(
 				m[0], m[1], m[2], m[3],
 				m[4], m[5], m[6], m[7],

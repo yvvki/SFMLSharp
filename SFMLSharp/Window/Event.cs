@@ -118,12 +118,14 @@ namespace SFML.Window
 	/// <param name="Control">Is the Control key pressed?</param>
 	/// <param name="Shift">Is the Shift key pressed?</param>
 	/// <param name="System">Is the System key pressed?</param>
+	[Serializable]
 	public readonly record struct KeyEventArgs(KeyCode Code, bool Alt, bool Control, bool Shift, bool System);
 
 	/// <summary>
 	///   Text event argument parameters (<see cref="EventType.TextEntered" />).
 	/// </summary>
 	/// <param name="Text">UTF-32 Unicode value of the character.</param>
+	[Serializable]
 	public readonly record struct TextEventArgs(string Text)
 	{
 		private readonly unsafe uint _data = (uint)char.ConvertToUtf32(Text, 0);
@@ -139,7 +141,7 @@ namespace SFML.Window
 	/// </summary>
 	/// <param name="X">X position of the mouse pointer, relative to the left of the owner window.</param>
 	/// <param name="Y">Y position of the mouse pointer, relative to the top of the owner window.</param>
-	[RequiresPreviewFeatures]
+	[Serializable]
 	public readonly record struct MouseMoveEventArgs(int X, int Y)
 	{
 		/// <summary>
@@ -147,16 +149,18 @@ namespace SFML.Window
 		/// </summary>
 		public Vector2<int> Position
 		{
+			[RequiresPreviewFeatures]
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => new(X, Y);
 		}
 
+		[RequiresPreviewFeatures]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator Vector2<int>(MouseMoveEventArgs value)
 		{
-			return new(value.X, value.Y);
+			return value.Position;
 		}
-	}
+	};
 
 	/// <summary>
 	///   Mouse buttons events argument parameters
@@ -165,7 +169,7 @@ namespace SFML.Window
 	/// <param name="Button">Code of the button that has been pressed.</param>
 	/// <param name="X">X position of the mouse pointer, relative to the left of the owner window.</param>
 	/// <param name="Y">Y position of the mouse pointer, relative to the top of the owner window.</param>
-	[RequiresPreviewFeatures]
+	[Serializable]
 	public readonly record struct MouseButtonEventArgs(MouseButton Button, int X, int Y)
 	{
 		/// <summary>
@@ -173,14 +177,16 @@ namespace SFML.Window
 		/// </summary>
 		public Vector2<int> Position
 		{
+			[RequiresPreviewFeatures]
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => new(X, Y);
 		}
 
+		[RequiresPreviewFeatures]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static explicit operator Vector2<int>(MouseButtonEventArgs value)
 		{
-			return new(value.X, value.Y);
+			return value.Position;
 		}
 	};
 
@@ -190,8 +196,8 @@ namespace SFML.Window
 	/// <param name="Delta">Number of ticks the wheel has moved (positive is up, negative is down).</param>
 	/// <param name="X">X position of the mouse pointer, relative to the left of the owner window.</param>
 	/// <param name="Y">Y position of the mouse pointer, relative to the top of the owner window.</param>
+	[Serializable]
 	[Obsolete("This event arguments is deprecated and potentially inaccurate. Use MouseWheelScrollEventArgs instead.")]
-	[RequiresPreviewFeatures]
 	public readonly record struct MouseWheelEventArgs(int Delta, int X, int Y)
 	{
 		/// <summary>
@@ -199,10 +205,12 @@ namespace SFML.Window
 		/// </summary>
 		public Vector2<int> Position
 		{
+			[RequiresPreviewFeatures]
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => new(X, Y);
 		}
 
+		[RequiresPreviewFeatures]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static explicit operator Vector2<int>(MouseWheelEventArgs value)
 		{
@@ -217,7 +225,7 @@ namespace SFML.Window
 	/// <param name="Delta">Wheel offset (positive is up/left, negative is down/right). High-precision mice may use non-integral offsets.</param>
 	/// <param name="X">X position of the mouse pointer, relative to the left of the owner window.</param>
 	/// <param name="Y">Y position of the mouse pointer, relative to the top of the owner window.</param>
-	[RequiresPreviewFeatures]
+	[Serializable]
 	public readonly record struct MouseWheelScrollEventArgs(MouseWheel Wheel, int Delta, int X, int Y)
 	{
 		/// <summary>
@@ -225,10 +233,12 @@ namespace SFML.Window
 		/// </summary>
 		public Vector2<int> Position
 		{
+			[RequiresPreviewFeatures]
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => new(X, Y);
 		}
 
+		[RequiresPreviewFeatures]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static explicit operator Vector2<int>(MouseWheelScrollEventArgs value)
 		{
@@ -242,8 +252,10 @@ namespace SFML.Window
 	/// <param name="JoystickId">Index of the joystick (in range [0 .. <see cref="Joystick.Count" /> - 1]).</param>
 	/// <param name="Axis">Axis on which the joystick moved.</param>
 	/// <param name="Position">New position on the axis (in range [-100 .. 100]).</param>
+	[Serializable]
 	public readonly record struct JoystickMoveEventArgs(uint JoystickId, JoystickAxis Axis, float Position);
 
+	[Serializable]
 	public readonly record struct JoystickButtonEventArgs(uint JoystickId, uint Button);
 
 	/// <summary>
@@ -251,6 +263,7 @@ namespace SFML.Window
 	///   (<see cref="EventType.JoystickConnected" />, <see cref="EventType.JoystickDisconnected" />).
 	/// </summary>
 	/// <param name="JoystickId">Index of the joystick (in range [0 .. <see cref="Joystick.Count" /> - 1]).</param>
+	[Serializable]
 	public readonly record struct JoystickConnectEventArgs(uint JoystickId);
 
 	/// <summary>
@@ -258,7 +271,7 @@ namespace SFML.Window
 	/// </summary>
 	/// <param name="Width">New width, in pixels.</param>
 	/// <param name="Height">New height, in pixels.</param>
-	[RequiresPreviewFeatures]
+	[Serializable]
 	public readonly record struct SizeEventArgs(uint Width, uint Height)
 	{
 		/// <summary>
@@ -266,10 +279,12 @@ namespace SFML.Window
 		/// </summary>
 		public Vector2<uint> Size
 		{
+			[RequiresPreviewFeatures]
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => new(Width, Height);
 		}
 
+		[RequiresPreviewFeatures]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator Vector2<uint>(SizeEventArgs value)
 		{
@@ -284,7 +299,7 @@ namespace SFML.Window
 	/// <param name="Finger">Index of the finger in case of multi-touch events.</param>
 	/// <param name="X">X position of the touch, relative to the left of the owner window.</param>
 	/// <param name="Y">Y position of the touch, relative to the top of the owner window.</param>
-	[RequiresPreviewFeatures]
+	[Serializable]
 	public readonly record struct TouchEventArgs(uint Finger, int X, int Y)
 	{
 		/// <summary>
@@ -292,10 +307,12 @@ namespace SFML.Window
 		/// </summary>
 		public Vector2<int> Position
 		{
+			[RequiresPreviewFeatures]
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => new(X, Y);
 		}
 
+		[RequiresPreviewFeatures]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static explicit operator Vector2<int>(TouchEventArgs value)
 		{
@@ -310,7 +327,7 @@ namespace SFML.Window
 	/// <param name="X">Current value of the sensor on X axis.</param>
 	/// <param name="Y">Current value of the sensor on Y axis.</param>
 	/// <param name="Z">Current value of the sensor on Z axis.</param>
-	[RequiresPreviewFeatures]
+	[Serializable]
 	public readonly record struct SensorEventArgs(SensorType Type, float X, float Y, float Z)
 	{
 		/// <summary>
@@ -318,16 +335,18 @@ namespace SFML.Window
 		/// </summary>
 		public Vector3<float> Value
 		{
+			[RequiresPreviewFeatures]
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => new(X, Y, Z);
 		}
 
+		[RequiresPreviewFeatures]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static explicit operator Vector3<float>(SensorEventArgs value)
 		{
 			return value.Value;
 		}
-	}
+	};
 
 	#endregion
 
@@ -338,6 +357,7 @@ namespace SFML.Window
 	/// </summary>
 	[RequiresPreviewFeatures]
 	[StructLayout(LayoutKind.Explicit)]
+	[Serializable]
 	public readonly struct Event
 	{
 		/// <summary>

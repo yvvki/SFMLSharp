@@ -253,10 +253,17 @@ namespace SFML.Graphics
 
 		protected virtual int IndexPointOf(Vector2<float> point)
 		{
-			var found = this
-				.Select((o, i) => new { o, i })
-				.FirstOrDefault(x => x.o.Equals(point));
-			return found != null ? found.i : -1;
+			//var found = this
+			//	.Select((o, i) => new { o, i })
+			//	.FirstOrDefault(x => x.o.Equals(point));
+			//return found != null ? found.i : -1;
+
+			for (nuint i = 0; i < GetPointCountNuint(); i++)
+			{
+				if (GetPointNuint(i).Equals(point)) return (int)i;
+			}
+
+			return -1;
 		}
 		int IList.IndexOf(object? value)
 		{
@@ -333,63 +340,12 @@ namespace SFML.Graphics
 			return sfShape_getGlobalBounds(Handle);
 		}
 
-		public class Enumerator : IEnumerator<Vector2<float>>
+		public IEnumerator<Vector2<float>> GetEnumerator()
 		{
-			private readonly Shape _shape;
-			private nuint _index = default;
-
-			public Vector2<float> Current => _shape.GetPointNuint(_index);
-			object IEnumerator.Current => Current;
-
-			public Enumerator(Shape shape)
+			for (nuint i = 0; i < GetPointCountNuint(); i++)
 			{
-				_shape = shape;
+				yield return GetPointNuint(i);
 			}
-
-			public bool MoveNext()
-			{
-				if (_index < _shape.GetPointCountNuint())
-				{
-					_index++;
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-
-			public void Reset()
-			{
-				_index = default;
-			}
-
-			public void Dispose()
-			{
-				Dispose(disposing: true);
-				GC.SuppressFinalize(this);
-			}
-
-			~Enumerator() => Dispose(disposing: false);
-
-			private bool _disposed;
-			protected virtual void Dispose(bool disposing)
-			{
-				if (_disposed) return;
-
-				if (disposing) Reset();
-
-				_disposed = true;
-			}
-		}
-
-		public Enumerator GetEnumerator()
-		{
-			return new(this);
-		}
-		IEnumerator<Vector2<float>> IEnumerable<Vector2<float>>.GetEnumerator()
-		{
-			return GetEnumerator();
 		}
 		IEnumerator IEnumerable.GetEnumerator()
 		{
@@ -409,12 +365,12 @@ namespace SFML.Graphics
 		{
 			if (_disposed) return;
 
-			if (disposing) OnDispose();
+			if (disposing) Destroy();
 
 			_disposed = true;
 		}
 
-		private protected virtual void OnDispose()
+		private protected virtual void Destroy()
 		{
 			sfShape_destroy(Handle);
 			if (_GCHandle.IsAllocated) _GCHandle.Free();
@@ -521,7 +477,7 @@ namespace SFML.Graphics
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern float sfShape_getOutlineThickness(Native* shape);
 
-		//// These should be on the derivied classes.
+		//// These should be on the derived classes.
 		//[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		//private static extern nuint sfShape_getPointCount(Native* shape);
 
