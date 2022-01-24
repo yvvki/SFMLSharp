@@ -5,6 +5,14 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SFMLSharp.Experimental\SFMLSharp.Experimental.csproj" />
+    <ProjectReference Include="..\SFMLSharp.Extensions\SFMLSharp.Extensions.csproj" />
+    <ProjectReference Include="..\SFMLSharp\SFMLSharp.csproj" />
+  </ItemGroup>
 
 </Project>
