@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>SFMLSharp</PackageId>
+    <PackageId>SFMLSharp.Extensions</PackageId>
     <Version>2.5.1-alpha.1.0</Version>
     <Authors>Yvvki Rika</Authors>
     <PackageDescription>

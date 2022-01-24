@@ -5,16 +5,27 @@ using SFML.Window;
 
 [assembly: RequiresPreviewFeatures]
 
-RenderWindow window = new();
-
-EventWindow eventWindow = new(window);
-eventWindow.Closed += () => window.Close();
+VideoMode videoMode = new(800, 600);
+RenderWindow window = new(videoMode, "SFMLSharp Example");
 
 RectangleShape shape = new();
+shape.Size = new(200, 200);
 
 while (window.IsOpen)
 {
-	window.Clear();
+	while (window.PollEvent(out Event e))
+	{
+		switch (e.Type)
+		{
+			case EventType.Closed:
+				window.Close();
+				break;
+		}
+	}
+
+	window.Clear(Color.Black);
 
 	window.Draw(shape);
+
+	window.Display();
 }

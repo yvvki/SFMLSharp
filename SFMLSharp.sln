@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CB6470E9-134
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFMLSharp.Experimental", "SFMLSharp.Experimental\SFMLSharp.Experimental.csproj", "{ED51748B-C673-42C3-BABA-5CC88D252048}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFMLSharp.Example", "SFMLSharp.Example\SFMLSharp.Example.csproj", "{F6D907E6-93F2-4697-AA20-1D58107D2CC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFMLSharp.Example", "SFMLSharp.Example\SFMLSharp.Example.csproj", "{F6D907E6-93F2-4697-AA20-1D58107D2CC3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

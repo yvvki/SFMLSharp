@@ -23,7 +23,7 @@ namespace SFML.Graphics
 		{
 			get
 			{
-				ThrowIfNotOpen();
+				ThrowIfNotCreated();
 				return _view!;
 			}
 			set => _view = value;
@@ -34,7 +34,7 @@ namespace SFML.Graphics
 		{
 			get
 			{
-				ThrowIfNotOpen();
+				ThrowIfNotCreated();
 				return _defaultView!;
 			}
 		}
@@ -93,7 +93,7 @@ namespace SFML.Graphics
 
 		public void Clear(Color? color = null)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			sfRenderWindow_clear(Handle, color ?? Color.Black);
 		}
 
@@ -104,7 +104,7 @@ namespace SFML.Graphics
 
 		public Vector2<float> MapPixelToCoords(Vector2<int> point, View? view)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			return sfRenderWindow_mapPixelToCoords(Handle, point, view!.Handle);
 		}
 
@@ -115,7 +115,7 @@ namespace SFML.Graphics
 
 		public Vector2<int> MapCoordsToPixel(Vector2<float> point, View? view)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			return sfRenderWindow_mapCoordsToPixel(Handle, point, view!.Handle);
 		}
 
@@ -126,7 +126,7 @@ namespace SFML.Graphics
 
 		public void Draw(ReadOnlySpan<Vertex> vertices, PrimitiveType type, RenderStates? states)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			fixed (Vertex* vertices_ptr = vertices)
 			{
 				fixed (RenderStates.Native* states_ptr = states)
@@ -143,31 +143,31 @@ namespace SFML.Graphics
 
 		void IRenderTarget.Draw(Sprite sprite, RenderStates.Native* states)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			sfRenderWindow_drawSprite(Handle, sprite.Handle, states);
 		}
 
 		void IRenderTarget.Draw(Text text, RenderStates.Native* states)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			sfRenderWindow_drawText(Handle, text.Handle, states);
 		}
 
 		void IRenderTarget.Draw(Shape shape, RenderStates.Native* states)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			sfRenderWindow_drawShape(Handle, shape.Handle, states);
 		}
 
 		void IRenderTarget.Draw(CircleShape shape, RenderStates.Native* states)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			sfRenderWindow_drawCircleShape(Handle, shape.Handle, states);
 		}
 
 		void IRenderTarget.Draw(RectangleShape shape, RenderStates.Native* states)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			sfRenderWindow_drawRectangleShape(Handle, shape.Handle, states);
 		}
 

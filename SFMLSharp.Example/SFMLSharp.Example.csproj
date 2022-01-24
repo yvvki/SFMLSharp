@@ -10,8 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SFMLSharp.Experimental\SFMLSharp.Experimental.csproj" />
-    <ProjectReference Include="..\SFMLSharp.Extensions\SFMLSharp.Extensions.csproj" />
     <ProjectReference Include="..\SFMLSharp\SFMLSharp.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 using SFML.System;
@@ -58,7 +59,7 @@ namespace SFML.Window
 		///   <see langword="true" /> if the window is open;
 		///   <see langword="false" /> if it has been closed.
 		/// </value>
-		public bool IsOpen => sfWindow_isOpen(Handle);
+		public bool IsOpen => Handle is not null && sfWindow_isOpen(Handle);
 
 		/// <summary>
 		///   Gets the settings of the OpenGL context of the window.
@@ -69,7 +70,14 @@ namespace SFML.Window
 		///   In this case, SFML chose the closest match.
 		/// </remarks>
 		/// <value>Structure containing the OpenGL context settings.</value>
-		public ContextSettings Settings => sfWindow_getSettings(Handle);
+		public ContextSettings Settings
+		{
+			get
+			{
+				ThrowIfNotCreated();
+				return sfWindow_getSettings(Handle);
+			}
+		}
 
 		/// <summary>
 		///   Gets or sets the position of the window.
@@ -81,8 +89,17 @@ namespace SFML.Window
 		/// <value>Position of the window, in pixels.</value>
 		public Vector2<int> Position
 		{
-			get => sfWindow_getPosition(Handle);
-			set => sfWindow_setPosition(Handle, value);
+			get
+			{
+				ThrowIfNotCreated();
+				return sfWindow_getPosition(Handle);
+			}
+
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setPosition(Handle, value);
+			}
 		}
 
 		/// <summary>
@@ -94,8 +111,17 @@ namespace SFML.Window
 		/// <value>Size of the window, in pixels</value>
 		public Vector2<uint> Size
 		{
-			get => sfWindow_getSize(Handle);
-			set => sfWindow_setSize(Handle, value);
+			get
+			{
+				ThrowIfNotCreated();
+				return sfWindow_getSize(Handle);
+			}
+
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setSize(Handle, value);
+			}
 		}
 
 		/// <summary>
@@ -104,21 +130,12 @@ namespace SFML.Window
 		/// <seealso cref="Icon" />
 		public string Title
 		{
-			set => sfWindow_setUnicodeTitle(Handle, UTF32Ptr.ToPointer(value));
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setUnicodeTitle(Handle, UTF32Ptr.ToPointer(value));
+			}
 		}
-
-		///// <summary>
-		/////   Sets the window's icon.
-		///// </summary>
-		///// <seealso cref="Title" />
-		//public Image Icon
-		//{
-		//	set
-		//	{
-		//		Vector2<uint> size = value.Size;
-		//		sfWindow_setIcon(Handle, size.X, size.Y, value.PixelsPtr);
-		//	}
-		//}
 
 		/// <summary>
 		///   Show or hide the window.
@@ -128,7 +145,11 @@ namespace SFML.Window
 		/// </remarks>
 		public bool Visible
 		{
-			set => sfWindow_setVisible(Handle, value);
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setVisible(Handle, value);
+			}
 		}
 
 		/// <summary>
@@ -143,7 +164,11 @@ namespace SFML.Window
 		/// </remarks>
 		public bool VerticalSyncEnabled
 		{
-			set => sfWindow_setVerticalSyncEnabled(Handle, value);
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setVerticalSyncEnabled(Handle, value);
+			}
 		}
 
 		/// <summary>
@@ -154,7 +179,11 @@ namespace SFML.Window
 		/// </remarks>
 		public bool MouseCursorVisible
 		{
-			set => sfWindow_setMouseCursorVisible(Handle, value);
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setMouseCursorVisible(Handle, value);
+			}
 		}
 
 		/// <summary>
@@ -167,7 +196,11 @@ namespace SFML.Window
 		/// </remarks>
 		public bool MouseCursorGrabbed
 		{
-			set => sfWindow_setMouseCursorGrabbed(Handle, value);
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setMouseCursorGrabbed(Handle, value);
+			}
 		}
 
 		/// <summary>
@@ -181,10 +214,14 @@ namespace SFML.Window
 		/// <seealso cref="Cursor" />
 		public Cursor MouseCursor
 		{
-			set => sfWindow_setMouseCursor(Handle,
-				value is null ? throw new ArgumentNullException(nameof(value)) :
-				value.IsCreated is false ? throw new ArgumentException("Cursor is not created.", nameof(value)) :
-				value.Handle);
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setMouseCursor(Handle,
+					value is null ? throw new ArgumentNullException(nameof(value)) :
+					value.IsCreated is false ? throw new ArgumentException("Cursor is not created.", nameof(value)) :
+					value.Handle);
+			}
 		}
 
 		/// <summary>
@@ -197,7 +234,11 @@ namespace SFML.Window
 		/// </remarks>
 		public bool KeyRepeatEnabled
 		{
-			set => sfWindow_setKeyRepeatEnabled(Handle, value);
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setKeyRepeatEnabled(Handle, value);
+			}
 		}
 
 		/// <summary>
@@ -214,7 +255,11 @@ namespace SFML.Window
 		/// </remarks>
 		public uint FramerateLimit
 		{
-			set => sfWindow_setFramerateLimit(Handle, value);
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setFramerateLimit(Handle, value);
+			}
 		}
 
 		/// <summary>
@@ -227,7 +272,11 @@ namespace SFML.Window
 		/// </remarks>
 		public float JoystickThreshold
 		{
-			set => sfWindow_setJoystickThreshold(Handle, value);
+			set
+			{
+				ThrowIfNotCreated();
+				sfWindow_setJoystickThreshold(Handle, value);
+			}
 		}
 
 		#endregion
@@ -320,7 +369,12 @@ namespace SFML.Window
 			WindowStyle style = WindowStyle.Default,
 			ContextSettings? settings = null)
 		{
-			Close();
+			if (Handle is not null)
+			{
+				sfWindow_close(Handle);
+				sfWindow_destroy(Handle);
+				Handle = null;
+			}
 			OnCreate(mode, title, style, settings);
 		}
 
@@ -365,11 +419,17 @@ namespace SFML.Window
 			IntPtr handle,
 			ContextSettings? settings = null)
 		{
-			Close();
+			if (Handle is not null)
+			{
+				sfWindow_close(Handle);
+				sfWindow_destroy(Handle);
+				Handle = null;
+			}
 			OnCreate(handle, settings);
 		}
 
-		private protected virtual void OnCreate(IntPtr handle,
+		private protected virtual void OnCreate(
+			IntPtr handle,
 			ContextSettings? settings = null)
 		{
 			ContextSettings.Native* settings_ptr = null;
@@ -402,9 +462,6 @@ namespace SFML.Window
 			if (Handle is not null)
 			{
 				sfWindow_close(Handle);
-				sfWindow_destroy(Handle);
-
-				Handle = null;
 			}
 		}
 
@@ -433,7 +490,7 @@ namespace SFML.Window
 		/// <seealso cref="WaitEvent(out Event)" />
 		public bool PollEvent(out Event @event)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			return sfWindow_pollEvent(Handle, out @event);
 		}
 
@@ -459,7 +516,7 @@ namespace SFML.Window
 		/// <seealso cref="PollEvent(out Event)" />
 		public bool WaitEvent(out Event @event)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			return sfWindow_waitEvent(Handle, out @event);
 		}
 
@@ -468,8 +525,9 @@ namespace SFML.Window
 		/// </summary>
 		internal void SetIcon(uint width, uint height, byte* pixels)
 		{
-			ThrowIfNotOpen();
-			//if (pixels is null) throw new ArgumentNullException(nameof(pixels));
+			ThrowIfNotCreated();
+
+			Debug.Assert(pixels is not null);
 
 			sfWindow_setIcon(Handle,
 				width,
@@ -516,7 +574,7 @@ namespace SFML.Window
 		/// </returns>
 		public bool SetActive(bool active)
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			return sfWindow_setActive(Handle, active);
 		}
 
@@ -533,7 +591,7 @@ namespace SFML.Window
 		/// </remarks>
 		public void RequestFocus()
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			sfWindow_requestFocus(Handle);
 		}
 
@@ -551,7 +609,7 @@ namespace SFML.Window
 		/// </returns>
 		public bool HasFocus()
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			return sfWindow_hasFocus(Handle);
 		}
 
@@ -565,7 +623,7 @@ namespace SFML.Window
 		/// </remarks>
 		public void Display()
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			sfWindow_display(Handle);
 		}
 
@@ -582,19 +640,16 @@ namespace SFML.Window
 		/// <returns>System handle of the window.</returns>
 		public IntPtr GetSystemHandle()
 		{
-			ThrowIfNotOpen();
+			ThrowIfNotCreated();
 			return sfWindow_getSystemHandle(Handle);
 		}
 
-		private protected void ThrowIfNotOpen()
+		private protected void ThrowIfNotCreated()
 		{
-			if (IsOpen is false) ThrowNotOpen();
-		}
+			if (Handle is null) ThrowNotCreated();
 
-		[DoesNotReturn]
-		private protected static void ThrowNotOpen()
-		{
-			throw new InvalidOperationException("Window is closed.");
+			[DoesNotReturn]
+			static void ThrowNotCreated() => throw new InvalidOperationException("Window is not created.");
 		}
 
 		#endregion
