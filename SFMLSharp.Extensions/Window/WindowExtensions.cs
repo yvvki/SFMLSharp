@@ -20,10 +20,10 @@ namespace SFML.Window
 				(byte*)pixels);
 		}
 
-		public static unsafe void SetIcon(this Window @this, Vector2<uint> size, Color* pixels)
-		{
-			@this.SetIcon(size.X, size.Y, pixels);
-		}
+		//internal static unsafe void SetIcon(this Window @this, Vector2<uint> size, Color* pixels)
+		//{
+		//	@this.SetIcon(size.X, size.Y, pixels);
+		//}
 
 		public static unsafe void SetIcon(this Window @this, uint width, uint height, ReadOnlySpan<Color> pixels)
 		{

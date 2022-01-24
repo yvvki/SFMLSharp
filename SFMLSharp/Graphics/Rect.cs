@@ -159,7 +159,7 @@ namespace SFML.Graphics
 			return new(Unsafe.AsPointer(ref rect), Count / Vector2<T>.Count);
 		}
 
-		public static Vector2<T> GetVector2(Rect<T> rect, int index)
+		internal static Vector2<T> GetVector2(Rect<T> rect, int index)
 		{
 			if ((uint)index is >= Count / Vector2<T>.Count)
 			{
@@ -197,7 +197,7 @@ namespace SFML.Graphics
 			Unsafe.Add(ref Unsafe.As<Rect<T>, Vector2<T>>(ref rect), index) = value;
 		}
 
-		public static T GetElement(Rect<T> rect, int index)
+		internal static T GetElement(Rect<T> rect, int index)
 		{
 			if ((uint)index is >= Count)
 			{

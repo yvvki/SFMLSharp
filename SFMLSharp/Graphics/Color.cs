@@ -138,7 +138,7 @@ namespace SFML.Graphics
 
 		#region Interface Methods
 
-		public static byte GetElement(Color color, int index)
+		internal static byte GetElement(Color color, int index)
 		{
 			if ((uint)index is >= Count)
 			{

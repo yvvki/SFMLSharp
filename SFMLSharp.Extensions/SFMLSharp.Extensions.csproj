@@ -12,6 +12,19 @@
     <RootNamespace>SFML</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>SFMLSharp</PackageId>
+    <Version>2.5.1-alpha.1.0</Version>
+    <Authors>Yvvki Rika</Authors>
+    <PackageDescription>
+      SFML is a simple, fast, cross-platform and object-oriented multimedia API.
+      It provides access to windowing, graphics, audio and network.
+      It is originally written in C++,
+      and this is the extensions for SFMLSharp.
+    </PackageDescription>
+    <RepositoryUrl>https://github.com/YvvkiRika/SFMLSharp</RepositoryUrl>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.HighPerformance" Version="7.1.2" />
   </ItemGroup>

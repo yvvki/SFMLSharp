@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
 
@@ -89,6 +90,16 @@ namespace SFML.System
 			W = w;
 		}
 
+		public Vector4(ReadOnlySpan<T> values)
+		{
+			if (values.Length is < Count)
+			{
+				throw new ArgumentOutOfRangeException(nameof(values));
+			}
+
+			this = Unsafe.ReadUnaligned<Vector4<T>>(ref Unsafe.As<T, byte>(ref MemoryMarshal.GetReference(values)));
+		}
+
 		#endregion
 
 		#region Static Methods
@@ -140,7 +151,7 @@ namespace SFML.System
 
 		public void CopyTo(T[] array, int index)
 		{
-			GetSpanUnsafe(ref this).ToArray().CopyTo(array, index);
+			GetSpanUnsafe(ref this).CopyTo(array.AsSpan()[index..]);
 		}
 
 		public void CopyTo(Span<T> destination)
@@ -154,12 +165,14 @@ namespace SFML.System
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static unsafe Span<T> GetSpanUnsafe(ref Vector4<T> vector)
+		public static unsafe Span<T> GetSpanUnsafe(ref Vector4<T> vector)
 		{
-			return new(Unsafe.AsPointer(ref vector), Count);
+			//return new(Unsafe.AsPointer(ref transform), Count);
+
+			return MemoryMarshal.CreateSpan(ref Unsafe.As<Vector4<T>, T>(ref vector), Count);
 		}
 
-		public static T GetElement(Vector4<T> vector, int index)
+		internal static T GetElement(Vector4<T> vector, int index)
 		{
 			if ((uint)index is >= Count)
 			{

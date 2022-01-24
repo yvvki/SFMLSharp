@@ -1,7 +1,11 @@
 ﻿using System.Collections;
+using System.ComponentModel;
+using System.Data.Common;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+//using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -21,74 +25,49 @@ namespace SFML.Graphics
 	{
 		#region Fields & Properties
 
-		internal const int FixedLength = 3 * 3;
+		internal const int Count = 3 * 3;
 
-		public static int Length => FixedLength;
+		public float M00;
+		public float M01;
+		public float M02;
 
-		private fixed float _matrix[FixedLength];
+		public float M10;
+		public float M11;
+		public float M12;
 
-		public float M00 { get => _matrix[0]; set => _matrix[0] = value; }
-		public float M01 { get => _matrix[1]; set => _matrix[1] = value; }
-		public float M02 { get => _matrix[2]; set => _matrix[2] = value; }
-		public float M10 { get => _matrix[3]; set => _matrix[3] = value; }
-		public float M11 { get => _matrix[4]; set => _matrix[4] = value; }
-		public float M12 { get => _matrix[5]; set => _matrix[5] = value; }
-		public float M20 { get => _matrix[6]; set => _matrix[6] = value; }
-		public float M21 { get => _matrix[7]; set => _matrix[7] = value; }
-		public float M22 { get => _matrix[8]; set => _matrix[8] = value; }
+		public float M20;
+		public float M21;
+		public float M22;
 
 		public float this[int row, int column]
 		{
 			get
 			{
-				if (row is < 0 or > 3)
+				if ((uint)row >= 3)
 				{
-					throw new IndexOutOfRangeException();
+					throw new ArgumentOutOfRangeException(nameof(row));
 				}
 
-				if (column is < 0 or > 3)
-				{
-					throw new IndexOutOfRangeException();
-				}
-
-				return _matrix[row + (column * 3)];
+				Vector3<float> vrow = Unsafe.Add(ref Unsafe.As<Transform, Vector3<float>>(ref this), row);
+				return vrow[column];
 			}
 			set
 			{
-				if (row is < 0 or > 3)
+				if ((uint)row >= 3)
 				{
-					throw new IndexOutOfRangeException();
+					throw new ArgumentOutOfRangeException(nameof(row));
 				}
 
-				if (column is < 0 or > 3)
-				{
-					throw new IndexOutOfRangeException();
-				}
-
-				_matrix[row + (column * 3)] = value;
+				ref Vector3<float> vrow = ref Unsafe.Add(ref Unsafe.As<Transform, Vector3<float>>(ref this), row);
+				Vector3<float> tmp = Vector3<float>.WithElement(vrow, column, value);
+				vrow = tmp;
 			}
 		}
 
-		private float this[int index]
+		internal float this[int index]
 		{
-			get
-			{
-				if (index is < 0 or > FixedLength)
-				{
-					throw new IndexOutOfRangeException();
-				}
-
-				return _matrix[index];
-			}
-			set
-			{
-				if (index is < 0 or > FixedLength)
-				{
-					throw new IndexOutOfRangeException();
-				}
-
-				_matrix[index] = value;
-			}
+			get => GetElement(this, index);
+			set => this = WithElement(this, index, value);
 		}
 
 		float IList<float>.this[int index]
@@ -104,9 +83,9 @@ namespace SFML.Graphics
 			set => this[index] = (float)value!; // automatically throws
 		}
 
-		int ICollection.Count => Length;
-		int ICollection<float>.Count => Length;
-		int IReadOnlyCollection<float>.Count => Length;
+		int ICollection.Count => Count;
+		int ICollection<float>.Count => Count;
+		int IReadOnlyCollection<float>.Count => Count;
 
 		bool ICollection.IsSynchronized => false;
 		object ICollection.SyncRoot => this;
@@ -135,65 +114,24 @@ namespace SFML.Graphics
 			float m10, float m11, float m12,
 			float m20, float m21, float m22)
 		{
-			_matrix[0] = m00; _matrix[1] = m01; _matrix[2] = m02;
-			_matrix[3] = m10; _matrix[4] = m11; _matrix[5] = m12;
-			_matrix[6] = m20; _matrix[7] = m21; _matrix[8] = m22;
+			M00 = m00; M01 = m01; M02 = m02;
+			M10 = m10; M11 = m11; M12 = m12;
+			M20 = m20; M21 = m21; M22 = m22;
 		}
 
-		public Transform(Span<float> matrix)
+		public Transform(ReadOnlySpan<float> values)
 		{
-			if (matrix.Length is < FixedLength) throw new ArgumentOutOfRangeException(nameof(matrix));
-
-			fixed (float* matrix_ptr = matrix, this_matrix_ptr = _matrix)
+			if (values.Length is < Count)
 			{
-				Buffer.MemoryCopy(
-					matrix_ptr,
-					this_matrix_ptr,
-					FixedLength * sizeof(float),
-					FixedLength * sizeof(float));
+				throw new ArgumentOutOfRangeException(nameof(values));
 			}
+
+			this = Unsafe.ReadUnaligned<Transform>(ref Unsafe.As<float, byte>(ref MemoryMarshal.GetReference(values)));
 		}
-
-		//public Transform(IEnumerable<float> matrix)
-		//{
-		//	if (matrix is null) throw new ArgumentNullException(nameof(matrix));
-
-		//	IEnumerator<float> enumerator = matrix.GetEnumerator();
-
-		//	_matrix[0] = enumerator.Current;
-		//	if (enumerator.MoveNext() is false) ThrowErr();
-		//	_matrix[1] = enumerator.Current;
-		//	if (enumerator.MoveNext() is false) ThrowErr();
-		//	_matrix[2] = enumerator.Current;
-		//	if (enumerator.MoveNext() is false) ThrowErr();
-		//	_matrix[3] = enumerator.Current;
-		//	if (enumerator.MoveNext() is false) ThrowErr();
-		//	_matrix[4] = enumerator.Current;
-		//	if (enumerator.MoveNext() is false) ThrowErr();
-		//	_matrix[5] = enumerator.Current;
-		//	if (enumerator.MoveNext() is false) ThrowErr();
-		//	_matrix[6] = enumerator.Current;
-		//	if (enumerator.MoveNext() is false) ThrowErr();
-		//	_matrix[7] = enumerator.Current;
-		//	if (enumerator.MoveNext() is false) ThrowErr();
-		//	_matrix[8] = enumerator.Current;
-		//	if (enumerator.MoveNext() is true) ThrowErr();
-
-		//	[DoesNotReturn]
-		//	static void ThrowErr() => throw new ArgumentOutOfRangeException(nameof(matrix), "Enumerable does not contains 9 items.");
-		//}
 
 		#endregion
 
 		#region Methods
-
-		public Span<float> AsSpan()
-		{
-			fixed (float* this_matrix_ptr = _matrix)
-			{
-				return new(this_matrix_ptr, FixedLength);
-			}
-		}
 
 		public Transform GetInverse()
 		{
@@ -205,6 +143,7 @@ namespace SFML.Graphics
 
 		private float[] GetMatrix()
 		{
+			// Matrix4x4
 			float[] matrix = new float[16];
 
 			fixed (Transform* this_ptr = &this)
@@ -244,8 +183,10 @@ namespace SFML.Graphics
 
 		public static Transform Combine(Transform transform, Transform other)
 		{
-			transform.Combine(other);
-			return transform;
+			Transform result = transform;
+
+			result.Combine(other);
+			return result;
 		}
 
 		public void Translate(float x, float y)
@@ -263,8 +204,10 @@ namespace SFML.Graphics
 
 		public static Transform Translate(Transform transform, float x, float y)
 		{
-			transform.Translate(x, y);
-			return transform;
+			Transform result = transform;
+
+			result.Translate(x, y);
+			return result;
 		}
 
 		public static Transform Translate(Transform transform, Vector2<float> translates)
@@ -292,8 +235,10 @@ namespace SFML.Graphics
 
 		public static Transform Rotate(Transform transform, float angle)
 		{
-			transform.Rotate(angle);
-			return transform;
+			Transform result = transform;
+
+			result.Rotate(angle);
+			return result;
 		}
 
 		public static Transform CreateRotate(float angle)
@@ -316,8 +261,10 @@ namespace SFML.Graphics
 
 		public static Transform Rotate(Transform transform, float angle, float centerX, float centerY)
 		{
-			transform.Rotate(angle, centerX, centerY);
-			return transform;
+			Transform result = transform;
+
+			result.Rotate(angle, centerX, centerY);
+			return result;
 		}
 
 		public static Transform Rotate(Transform transform, float angle, Vector2<float> center)
@@ -360,8 +307,10 @@ namespace SFML.Graphics
 
 		public static Transform Scale(Transform transform, float x, float y)
 		{
-			transform.Scale(x, y);
-			return transform;
+			Transform result = transform;
+
+			result.Scale(x, y);
+			return result;
 		}
 
 		public static Transform Scale(Transform transform, Vector2<float> scaling)
@@ -394,8 +343,10 @@ namespace SFML.Graphics
 
 		public static Transform Scale(Transform transform, float x, float y, float centerX, float centerY)
 		{
-			transform.Scale(x, y, centerX, centerY);
-			return transform;
+			Transform result = transform;
+
+			result.Scale(x, y, centerX, centerY);
+			return result;
 		}
 
 		public static Transform Scale(Transform transform, Vector2<float> scale, float centerX, float centerY)
@@ -437,14 +388,78 @@ namespace SFML.Graphics
 
 		#region Interface Methods
 
+		public void CopyTo(float[] array, int index)
+		{
+			GetSpanUnsafe(ref this).CopyTo(array.AsSpan()[index..]);
+		}
+
+		public void CopyTo(Span<float> destination)
+		{
+			GetSpanUnsafe(ref this).CopyTo(destination);
+		}
+
+		public bool TryCopyTo(Span<float> destination)
+		{
+			return GetSpanUnsafe(ref this).TryCopyTo(destination);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static unsafe Span<float> GetSpanUnsafe(ref Transform transform)
+		{
+			//return new(Unsafe.AsPointer(ref transform), Count);
+
+			return MemoryMarshal.CreateSpan(ref Unsafe.As<Transform, float>(ref transform), Count);
+		}
+
+		internal static float GetElement(Transform transform, int index)
+		{
+			if ((uint)index is >= Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
+			return GetElementUnsafe(ref transform, index);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static float GetElementUnsafe(ref Transform transform, int index)
+		{
+			Debug.Assert(index is >= 0 and < Count);
+			return Unsafe.Add(ref Unsafe.As<Transform, float>(ref transform), index);
+		}
+
+		internal static Transform WithElement(Transform transform, int index, float value)
+		{
+			if ((uint)index is >= Count)
+			{
+				throw new IndexOutOfRangeException();
+			}
+
+			var meh = 2;
+
+			Transform result = transform;
+
+			SetElementUnsafe(ref result, index, value);
+
+			return result;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static void SetElementUnsafe(ref Transform transform, int index, float value)
+		{
+			Debug.Assert(index is >= 0 and < Count);
+			Unsafe.Add(ref Unsafe.As<Transform, float>(ref transform), index) = value;
+		}
+
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public void Deconstruct(
 			out float m00, out float m01, out float m02,
 			out float m10, out float m11, out float m12,
 			out float m20, out float m21, out float m22)
 		{
-			m00 = _matrix[0]; m01 = _matrix[1]; m02 = _matrix[2];
-			m10 = _matrix[3]; m11 = _matrix[4]; m12 = _matrix[5];
-			m20 = _matrix[6]; m21 = _matrix[7]; m22 = _matrix[8];
+			m00 = M00; m01 = M01; m02 = M02;
+			m10 = M10; m11 = M11; m12 = M12;
+			m20 = M20; m21 = M21; m22 = M22;
 		}
 
 		public Vector3<float> GetRow(int column)
@@ -454,13 +469,10 @@ namespace SFML.Graphics
 				throw new ArgumentOutOfRangeException(nameof(column));
 			}
 
-			return new(_matrix[column * 3], _matrix[(column * 3) + 1], _matrix[(column * 3) + 2]);
+			Span<float> matrix = GetSpanUnsafe(ref this);
 
-			// Possible faster method? 
-			//fixed (float* this_matrix_ptr = _matrix)
-			//{
-			//	return Unsafe.As<float, Vector3<float>>(ref Unsafe.AsRef<float>(this_matrix_ptr + (column * 3)));
-			//}
+			return new(matrix[column + (0 * 3)], matrix[column + (1 * 3)], matrix[column + (2 * 3)]);
+
 		}
 
 		public Vector3<float> GetColumn(int row)
@@ -470,7 +482,12 @@ namespace SFML.Graphics
 				throw new ArgumentOutOfRangeException(nameof(row));
 			}
 
-			return new(_matrix[row], _matrix[row + (1 * 3)], _matrix[row + (2 * 3)]);
+			Span<float> matrix = GetSpanUnsafe(ref this);
+
+			return new(matrix[(row * 3) + 0], matrix[(row * 3) + 1], matrix[(row * 3) + 2]);
+
+			//Vector3<float> vrow = Unsafe.Add(ref Unsafe.As<Transform, Vector3<float>>(ref this), row);
+			//return vrow;
 		}
 
 		public IEnumerator<float> GetEnumerator()
@@ -492,29 +509,19 @@ namespace SFML.Graphics
 
 		public bool Equals(Transform other)
 		{
-			//return _matrix[0].Equals(other._matrix[0])
-			//	&& _matrix[1].Equals(other._matrix[1])
-			//	&& _matrix[2].Equals(other._matrix[2])
-			//	&& _matrix[3].Equals(other._matrix[3])
-			//	&& _matrix[4].Equals(other._matrix[4])
-			//	&& _matrix[5].Equals(other._matrix[5])
-			//	&& _matrix[6].Equals(other._matrix[6])
-			//	&& _matrix[7].Equals(other._matrix[7])
-			//	&& _matrix[8].Equals(other._matrix[8]);
-
 			// Check diagonal elements first.
-			return _matrix[0].Equals(other._matrix[0])
-				&& _matrix[4].Equals(other._matrix[3])
-				&& _matrix[8].Equals(other._matrix[8])
+			return M00.Equals(other.M00)
+				&& M11.Equals(other.M11)
+				&& M22.Equals(other.M22)
 
-				&& _matrix[1].Equals(other._matrix[1])
-				&& _matrix[2].Equals(other._matrix[2])
+				&& M01.Equals(other.M01)
+				&& M02.Equals(other.M02)
 
-				&& _matrix[3].Equals(other._matrix[3])
-				&& _matrix[5].Equals(other._matrix[5])
+				&& M10.Equals(other.M10)
+				&& M12.Equals(other.M12)
 
-				&& _matrix[6].Equals(other._matrix[6])
-				&& _matrix[7].Equals(other._matrix[7]);
+				&& M20.Equals(other.M20)
+				&& M21.Equals(other.M21);
 		}
 
 		public override bool Equals([NotNullWhen(true)] object? obj)
@@ -525,9 +532,9 @@ namespace SFML.Graphics
 		public override int GetHashCode()
 		{
 			HashCode hashCode = new();
-			hashCode.Add(_matrix[0]); hashCode.Add(_matrix[1]); hashCode.Add(_matrix[2]);
-			hashCode.Add(_matrix[3]); hashCode.Add(_matrix[4]); hashCode.Add(_matrix[5]);
-			hashCode.Add(_matrix[6]); hashCode.Add(_matrix[7]); hashCode.Add(_matrix[8]);
+			hashCode.Add(M00); hashCode.Add(M01); hashCode.Add(M02);
+			hashCode.Add(M10); hashCode.Add(M11); hashCode.Add(M12);
+			hashCode.Add(M20); hashCode.Add(M21); hashCode.Add(M22);
 			return hashCode.ToHashCode();
 		}
 
@@ -537,23 +544,23 @@ namespace SFML.Graphics
 			string tab = "\t";
 			string newLine = Environment.NewLine;
 
-			sb.Append(_matrix[0].ToString(format, formatProvider));
+			sb.Append(M00.ToString(format, formatProvider));
 			sb.Append(tab);
-			sb.Append(_matrix[1].ToString(format, formatProvider));
+			sb.Append(M01.ToString(format, formatProvider));
 			sb.Append(tab);
-			sb.Append(_matrix[2].ToString(format, formatProvider));
+			sb.Append(M02.ToString(format, formatProvider));
 			sb.Append(newLine);
-			sb.Append(_matrix[3].ToString(format, formatProvider));
+			sb.Append(M10.ToString(format, formatProvider));
 			sb.Append(tab);
-			sb.Append(_matrix[4].ToString(format, formatProvider));
+			sb.Append(M11.ToString(format, formatProvider));
 			sb.Append(tab);
-			sb.Append(_matrix[5].ToString(format, formatProvider));
+			sb.Append(M12.ToString(format, formatProvider));
 			sb.Append(newLine);
-			sb.Append(_matrix[6].ToString(format, formatProvider));
+			sb.Append(M20.ToString(format, formatProvider));
 			sb.Append(tab);
-			sb.Append(_matrix[7].ToString(format, formatProvider));
+			sb.Append(M21.ToString(format, formatProvider));
 			sb.Append(tab);
-			sb.Append(_matrix[8].ToString(format, formatProvider));
+			sb.Append(M22.ToString(format, formatProvider));
 			sb.Append(newLine);
 
 			return sb.ToString();
@@ -589,13 +596,12 @@ namespace SFML.Graphics
 
 		private bool Contains(float item)
 		{
-			return AsSpan().Contains(item);
+			return GetSpanUnsafe(ref this).Contains(item);
 		}
 
 		bool IList.Contains(object? value)
 		{
-			if (value is float item) return Contains(item);
-			else return false;
+			return value is float item && Contains(item);
 		}
 
 		bool ICollection<float>.Contains(float item)
@@ -605,13 +611,12 @@ namespace SFML.Graphics
 
 		private int IndexOf(float item)
 		{
-			return AsSpan().IndexOf(item);
+			return GetSpanUnsafe(ref this).IndexOf(item);
 		}
 
 		int IList.IndexOf(object? value)
 		{
-			if (value is float item) return IndexOf(item);
-			else return -1;
+			return value is float item ? IndexOf(item) : -1;
 		}
 
 		int IList<float>.IndexOf(float item)
@@ -648,11 +653,6 @@ namespace SFML.Graphics
 		void IList<float>.RemoveAt(int index)
 		{
 			ThrowFixed();
-		}
-
-		private void CopyTo(float[] array, int arrayIndex)
-		{
-			AsSpan().CopyTo(array.AsSpan()[arrayIndex..]);
 		}
 
 		void ICollection.CopyTo(Array array, int index)
@@ -715,54 +715,34 @@ namespace SFML.Graphics
 
 		public static bool operator ==(Transform left, Transform right)
 		{
-			//return left.M00 == right.M00
-			//	&& left.M01 == right.M01
-			//	&& left.M02 == right.M02
-			//	&& left.M10 == right.M10
-			//	&& left.M11 == right.M11
-			//	&& left.M12 == right.M12
-			//	&& left.M20 == right.M20
-			//	&& left.M21 == right.M21
-			//	&& left.M22 == right.M22;
+			return left.M00 == right.M00
+				&& left.M11 == right.M11
+				&& left.M22 == right.M22
 
-			return left._matrix[0] == right._matrix[0]
-				&& left._matrix[4] == right._matrix[4]
-				&& left._matrix[8] == right._matrix[8]
+				&& left.M01 == right.M01
+				&& left.M02 == right.M02
 
-				&& left._matrix[1] == right._matrix[1]
-				&& left._matrix[2] == right._matrix[2]
+				&& left.M10 == right.M10
+				&& left.M12 == right.M12
 
-				&& left._matrix[3] == right._matrix[3]
-				&& left._matrix[5] == right._matrix[5]
-
-				&& left._matrix[6] == right._matrix[6]
-				&& left._matrix[7] == right._matrix[7];
+				&& left.M20 == right.M20
+				&& left.M21 == right.M21;
 		}
 
 		public static bool operator !=(Transform left, Transform right)
 		{
-			//return left.M00 != right.M00
-			//	|| left.M01 != right.M01
-			//	|| left.M02 != right.M02
-			//	|| left.M10 != right.M10
-			//	|| left.M11 != right.M11
-			//	|| left.M12 != right.M12
-			//	|| left.M20 != right.M20
-			//	|| left.M21 != right.M21
-			//	|| left.M22 != right.M22;
+			return left.M00 != right.M00
+				|| left.M11 != right.M11
+				|| left.M22 != right.M22
 
-			return left._matrix[0] != right._matrix[0]
-				|| left._matrix[4] != right._matrix[4]
-				|| left._matrix[8] != right._matrix[8]
+				|| left.M01 != right.M01
+				|| left.M02 != right.M02
 
-				|| left._matrix[1] != right._matrix[1]
-				|| left._matrix[2] != right._matrix[2]
+				|| left.M10 != right.M10
+				|| left.M12 != right.M12
 
-				|| left._matrix[3] != right._matrix[3]
-				|| left._matrix[5] != right._matrix[5]
-
-				|| left._matrix[6] != right._matrix[6]
-				|| left._matrix[7] != right._matrix[7];
+				|| left.M20 != right.M20
+				|| left.M21 != right.M21;
 		}
 
 		// Natively supported
@@ -806,6 +786,8 @@ namespace SFML.Graphics
 				m[4], m[5], m[6], m[7],
 				m[8], m[9], m[10], m[11],
 				m[12], m[13], m[14], m[15]);
+
+			//return Unsafe.As<float, Matrix4x4>(ref MemoryMarshal.GetArrayDataReference(m));
 		}
 
 		//// Not supported.
@@ -818,12 +800,11 @@ namespace SFML.Graphics
 		//}
 
 		/*
-		 * Transforms are transposed. We need to
-		 * transpose it again for the 3x2 matrix.
+		 * Transforms are transposed. We need to transpose it again
+		 * for the 3x2 matrix.
 		 * 
-		 * From checking, the last column of the
-		 * transform never change due to the nature
-		 * of matrix transformation in 2D space.
+		 * The last column of the transform rarely change
+		 * due to the nature of matrix transformation in 2D space.
 		 * 
 		 *      Transform                 Matrix3x2
 		 * +-----+-----+-----+       +-----+-----+     +
@@ -851,8 +832,8 @@ namespace SFML.Graphics
 		public static explicit operator Matrix3x2(Transform value)
 		{
 			return new(
-				value._matrix[0], value._matrix[2], value._matrix[4],
-				value._matrix[1], value._matrix[3], value._matrix[5]);
+				value.M00, value.M10, value.M20,
+				value.M01, value.M11, value.M22);
 		}
 
 		public static explicit operator Transform(Matrix3x2 value)

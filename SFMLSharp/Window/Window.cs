@@ -626,12 +626,12 @@ namespace SFML.Window
 
 		internal readonly struct Native { }
 
-		//[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi, ExactSpelling = true)]
-		//private static extern IntPtr sfWindow_create(
+		//[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+		//private static extern Native* sfWindow_create(
 		//	VideoMode mode,
 		//	string title,
 		//	WindowStyle style,
-		//	[Const] ContextSettings settings);
+		//	ContextSettings.Native* settings);
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Native* sfWindow_createUnicode(

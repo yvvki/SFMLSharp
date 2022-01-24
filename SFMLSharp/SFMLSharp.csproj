@@ -12,6 +12,19 @@
     <RootNamespace>SFML</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>SFMLSharp</PackageId>
+    <Version>2.5.1-alpha.1.0</Version>
+    <Authors>Yvvki Rika</Authors>
+    <PackageDescription>
+      SFML is a simple, fast, cross-platform and object-oriented multimedia API.
+      It provides access to windowing, graphics, audio and network.
+      It is originally written in C++,
+      and this is a binding over the C binding in C# for .NET 6.0.
+    </PackageDescription>
+    <RepositoryUrl>https://github.com/YvvkiRika/SFMLSharp</RepositoryUrl>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="CSFML.Redist" Version="2.5.1" />
     <PackageReference Include="System.Runtime.Experimental" Version="6.0.2-mauipre.1.22054.8" />
