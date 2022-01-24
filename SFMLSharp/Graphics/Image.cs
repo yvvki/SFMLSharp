@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 
 using SFML.System;
 
-using static System.Net.Mime.MediaTypeNames;
 using static SFML.Graphics.DllName;
 
 namespace SFML.Graphics
@@ -253,7 +252,7 @@ namespace SFML.Graphics
 			return GetPixels().GetEnumerator();
 		}
 
-		IEnumerator<Color> GetEnumeratorUnsafe()
+		private IEnumerator<Color> GetEnumeratorUnsafe()
 		{
 			Vector2<uint> size = Size;
 

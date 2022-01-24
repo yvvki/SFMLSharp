@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.ComponentModel;
-using System.Data.Common;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
@@ -434,8 +433,6 @@ namespace SFML.Graphics
 			{
 				throw new IndexOutOfRangeException();
 			}
-
-			var meh = 2;
 
 			Transform result = transform;
 

@@ -8,8 +8,6 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
 
-using SFML.Graphics;
-
 namespace SFML.System
 {
 	/// <summary>
