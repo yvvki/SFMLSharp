@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace SFML.Graphics
@@ -14,6 +15,10 @@ namespace SFML.Graphics
 	[Serializable]
 	public struct Color :
 		IEquatable<Color>,
+		IEqualityOperators<Color, Color>,
+		IAdditionOperators<Color, Color, Color>,
+		ISubtractionOperators<Color, Color, Color>,
+		IMultiplyOperators<Color, Color, Color>,
 		IFormattable,
 		IEnumerable<byte>
 	{
@@ -89,11 +94,17 @@ namespace SFML.Graphics
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Color FromInterger(uint value)
 		{
-			return new(
-				r: (byte)(value >> 24),
-				g: (byte)(value >> 16),
-				b: (byte)(value >> 8),
-				a: (byte)value);
+			//return new(
+			//	r: (byte)(value >> 24),
+			//	g: (byte)(value >> 16),
+			//	b: (byte)(value >> 8),
+			//	a: (byte)value);
+
+			Color result;
+
+			result = Unsafe.ReadUnaligned<Color>(ref Unsafe.As<uint, byte>(ref value));
+
+			return result;
 		}
 
 		#endregion
@@ -131,12 +142,37 @@ namespace SFML.Graphics
 			//	(uint)(B << 8) |
 			//	A;
 
-			return Unsafe.As<Color, uint>(ref this);
+			Color result = this;
+
+			return Unsafe.As<Color, uint>(ref result);
 		}
 
 		#endregion
 
 		#region Interface Methods
+
+		public void CopyTo(byte[] array, int index)
+		{
+			GetSpanUnsafe(ref this).CopyTo(array.AsSpan()[index..]);
+		}
+
+		public void CopyTo(Span<byte> destination)
+		{
+			GetSpanUnsafe(ref this).CopyTo(destination);
+		}
+
+		public bool TryCopyTo(Span<byte> destination)
+		{
+			return GetSpanUnsafe(ref this).TryCopyTo(destination);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static unsafe Span<byte> GetSpanUnsafe(ref Color color)
+		{
+			//return new(Unsafe.AsPointer(ref color), Count);
+
+			return MemoryMarshal.CreateSpan(ref Unsafe.As<Color, byte>(ref color), Count);
+		}
 
 		internal static byte GetElement(Color color, int index)
 		{

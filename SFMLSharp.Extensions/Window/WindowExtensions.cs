@@ -59,7 +59,7 @@ namespace SFML.Window
 			if (image is null) throw new ArgumentNullException(nameof(image));
 
 			Vector2<uint> size = image.Size;
-			@this.SetIcon(size.X, size.Y, image.GetPixelsPointer());
+			@this.SetIcon(size.X, size.Y, image.GetPixelsPtr());
 		}
 	}
 }

@@ -163,7 +163,7 @@ namespace SFML.System
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static unsafe Span<T> GetSpanUnsafe(ref Vector4<T> vector)
+		internal static unsafe Span<T> GetSpanUnsafe(ref Vector4<T> vector)
 		{
 			//return new(Unsafe.AsPointer(ref transform), Count);
 

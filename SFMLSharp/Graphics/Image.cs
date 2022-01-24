@@ -21,7 +21,7 @@ namespace SFML.Graphics
 
 		public Vector2<uint> Size => sfImage_getSize(Handle);
 
-		internal int Length
+		internal int Count
 		{
 			get
 			{
@@ -30,9 +30,9 @@ namespace SFML.Graphics
 			}
 		}
 
-		int ICollection.Count => Length;
-		int ICollection<Color>.Count => Length;
-		int IReadOnlyCollection<Color>.Count => Length;
+		int ICollection.Count => Count;
+		int ICollection<Color>.Count => Count;
+		int IReadOnlyCollection<Color>.Count => Count;
 
 		bool ICollection.IsSynchronized => false;
 		object ICollection.SyncRoot => this;
@@ -154,7 +154,7 @@ namespace SFML.Graphics
 
 		#region Methods
 
-		internal byte* GetPixelsPointer()
+		internal byte* GetPixelsPtr()
 		{
 			return sfImage_getPixelsPtr(Handle);
 		}
@@ -162,16 +162,16 @@ namespace SFML.Graphics
 		public Span<byte> GetPixelsByte()
 		{
 			Vector2<uint> size = Size;
-			return new(GetPixelsPointer(), (int)(size.X * size.Y * sizeof(Color)));
+			return new(GetPixelsPtr(), (int)(size.X * size.Y * sizeof(Color)));
 		}
 
 		public Span<Color> GetPixels()
 		{
 			Vector2<uint> size = Size;
-			return new(GetPixelsPointer(), (int)(size.X * size.Y));
+			return new(GetPixelsPtr(), (int)(size.X * size.Y));
 		}
 
-		public bool TrySaveToFile(string file)
+		public bool SaveToFile(string file)
 		{
 			return sfImage_saveToFile(Handle, file);
 		}
@@ -205,17 +205,34 @@ namespace SFML.Graphics
 
 		#region Interface Methods
 
+		public void CopyTo(Color[] array, int index)
+		{
+			GetPixels().CopyTo(array.AsSpan()[index..]);
+		}
+
+		public void CopyTo(Span<Color> destination)
+		{
+			GetPixels().CopyTo(destination);
+		}
+
+		public bool TryCopyTo(Span<Color> destination)
+		{
+			return GetPixels().TryCopyTo(destination);
+		}
+
 		[DoesNotReturn]
 		private static void ThrowFixed()
 		{
-			throw new NotSupportedException("Image has fixed length.");
+			throw new NotSupportedException();
 		}
 
+		[DoesNotReturn]
 		void ICollection<Color>.Add(Color item)
 		{
 			ThrowFixed();
 		}
 
+		[DoesNotReturn]
 		void ICollection<Color>.Clear()
 		{
 			ThrowFixed();
@@ -226,21 +243,12 @@ namespace SFML.Graphics
 			return GetPixels().Contains(item);
 		}
 
-		private void CopyTo(Span<Color> array, int arrayIndex)
-		{
-			GetPixels().CopyTo(array[arrayIndex..]);
-		}
-
-		void ICollection<Color>.CopyTo(Color[] array, int arrayIndex)
-		{
-			CopyTo(array, arrayIndex);
-		}
-
 		void ICollection.CopyTo(Array array, int index)
 		{
 			CopyTo((Color[])array, index);
 		}
 
+		[DoesNotReturn]
 		bool ICollection<Color>.Remove(Color item)
 		{
 			ThrowFixed();

@@ -6,7 +6,10 @@ namespace SFML.System
 	/// <summary>
 	///   Represents a time value.
 	/// </summary>
-	public readonly struct Time : IEquatable<Time>, IComparable, IComparable<Time>
+	public readonly struct Time :
+		IEquatable<Time>,
+		IComparable,
+		IComparable<Time>
 	{
 		#region Field & Properties
 
@@ -27,7 +30,7 @@ namespace SFML.System
 		/// </summary>
 		/// <seealso cref="Seconds" />
 		/// <seealso cref="Microseconds" />
-		// literally unuseable
+		// literally unusable
 		public int Milliseconds => (int)(_microseconds / TicksPerMillisecond);
 
 		/// <summary>
@@ -55,7 +58,7 @@ namespace SFML.System
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Time FromMilliseconds(int value)
 		{
-			return new(value * TicksPerSecond);
+			return new(value * TicksPerMillisecond);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -70,19 +73,28 @@ namespace SFML.System
 
 		public static Time Min(Time left, Time right)
 		{
-			return left <= right ? left : right;
+			//return left <= right ? left : right;
+
+			long result = Math.Min(left._microseconds, right._microseconds);
+			return new(result);
 		}
 
 		public static Time Max(Time left, Time right)
 		{
-			return left >= right ? left : right;
+			//return left >= right ? left : right;
+
+			long result = Math.Max(left._microseconds, right._microseconds);
+			return new(result);
 		}
 
 		public static Time Clamp(Time value, Time min, Time max)
 		{
-			if (max < min) throw new ArgumentOutOfRangeException(nameof(max));
+			//if (max < min) throw new ArgumentOutOfRangeException(nameof(max));
 
-			return value >= min ? value <= max ? value : max : min;
+			//return value >= min ? value <= max ? value : max : min;
+
+			long result = Math.Clamp(value._microseconds, min._microseconds, max._microseconds);
+			return new(result);
 		}
 
 		#endregion
@@ -94,13 +106,15 @@ namespace SFML.System
 			return _microseconds.CompareTo(other._microseconds);
 		}
 
-		public int CompareTo(object? obj)
+		int IComparable.CompareTo(object? obj)
 		{
-			if (obj is null) return 1;
+			//return obj is null
+			//	? 1
+			//	: obj is Time other
+			//	? CompareTo(other)
+			//	: throw new ArgumentException("Object must be of type SFML.System.Time");
 
-			else if (obj is Time other) return CompareTo(other);
-
-			else throw new ArgumentException("Object must be of type SFML.System.Time");
+			return CompareTo((Time)obj!);
 		}
 
 		public bool Equals(Time other)
@@ -266,16 +280,16 @@ namespace SFML.System
 
 		#region Cast Operators
 
-		internal const long TimeSpanTicksRatio = TimeSpan.TicksPerMillisecond / TicksPerMillisecond;
+		private const long TimeSpanTicksRatio = TimeSpan.TicksPerMillisecond / TicksPerMillisecond;
 
-		public static explicit operator TimeSpan(Time time)
+		public static explicit operator TimeSpan(Time value)
 		{
-			return TimeSpan.FromTicks(time._microseconds * TimeSpanTicksRatio);
+			return TimeSpan.FromTicks(value._microseconds * TimeSpanTicksRatio);
 		}
 
-		public static explicit operator Time(TimeSpan time)
+		public static explicit operator Time(TimeSpan value)
 		{
-			return FromMicroseconds(time.Ticks / TimeSpanTicksRatio);
+			return FromMicroseconds(value.Ticks / TimeSpanTicksRatio);
 		}
 
 		#endregion

@@ -38,7 +38,7 @@ namespace SFML.Window
 
 		public static unsafe bool TryLoadFromImage(this Cursor @this, Image image, Vector2<uint> hotspot = default)
 		{
-			return @this.TryLoadFromPixels(image.GetPixelsPointer(), image.Size, hotspot);
+			return @this.TryLoadFromPixels(image.GetPixelsPtr(), image.Size, hotspot);
 		}
 	}
 }
