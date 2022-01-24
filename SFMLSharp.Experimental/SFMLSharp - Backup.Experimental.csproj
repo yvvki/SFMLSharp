@@ -17,11 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SFMLSharp\SFMLSharp.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Graphics\" />
+    <Folder Include="System\" />
   </ItemGroup>
   
 </Project>
