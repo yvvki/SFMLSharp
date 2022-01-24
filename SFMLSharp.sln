@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CB6470E9-1342-4D4E-B8B0-560F80EC9B86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFMLSharp.Experimental", "SFMLSharp.Experimental\SFMLSharp.Experimental.csproj", "{ED51748B-C673-42C3-BABA-5CC88D252048}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +31,18 @@ Global
 		{7464736E-AA46-479F-B6BB-1BCC2CBBC2EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7464736E-AA46-479F-B6BB-1BCC2CBBC2EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7464736E-AA46-479F-B6BB-1BCC2CBBC2EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED51748B-C673-42C3-BABA-5CC88D252048}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED51748B-C673-42C3-BABA-5CC88D252048}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED51748B-C673-42C3-BABA-5CC88D252048}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED51748B-C673-42C3-BABA-5CC88D252048}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1F61763D-6083-45D3-BEAD-E8CA93BC0CE4} = {CB6470E9-1342-4D4E-B8B0-560F80EC9B86}
+		{7464736E-AA46-479F-B6BB-1BCC2CBBC2EB} = {CB6470E9-1342-4D4E-B8B0-560F80EC9B86}
+		{ED51748B-C673-42C3-BABA-5CC88D252048} = {CB6470E9-1342-4D4E-B8B0-560F80EC9B86}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8375957A-5091-487C-9545-83407D4DF226}
