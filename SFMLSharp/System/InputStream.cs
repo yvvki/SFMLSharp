@@ -28,8 +28,29 @@ namespace SFML.System
 		[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 		private static long Read(void* data, long size, void* userData)
 		{
-			return GetTarget((IntPtr)userData)
-				.Read(new Span<byte>(data, size > int.MaxValue ? int.MaxValue : (int)size));
+			long result;
+
+			Stream stream = GetTarget((IntPtr)userData);
+
+			// Stream cannot read more than int.MaxValue.
+			if (size is <= int.MaxValue)
+			{
+				Span<byte> buffer = new(data, (int)size);
+
+				result = stream.Read(buffer);
+			}
+			else
+			{
+				// Size of long is twice of int, hence we need to read twice.
+				// First buffer, limited to int.MaxValue.
+				Span<byte> buffer1 = new(data, int.MaxValue);
+				// Second buffer, the rest.
+				Span<byte> buffer2 = new((byte*)data + int.MaxValue, (int)(size - int.MaxValue));
+
+				result = stream.Read(buffer1) + stream.Read(buffer2);
+			}
+
+			return result;
 		}
 
 		[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
@@ -60,6 +81,7 @@ namespace SFML.System
 		{
 			GCHandle handle = GCHandle.FromIntPtr(UserData);
 
+			// Dispose only if allocated, it will throws otherwise,
 			if (handle.IsAllocated) handle.Free();
 		}
 	}
