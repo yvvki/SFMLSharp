@@ -38,47 +38,5 @@ namespace SFML.Window
 		bool SRgbCapable = false)
 	{
 		public static readonly ContextSettings Default = new();
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static Native GetHandle(ContextSettings contextSettings)
-		{
-			return new(
-				contextSettings.DepthBits,
-				contextSettings.StencilBits,
-				contextSettings.AntialiasingLevel,
-				contextSettings.MajorVersion,
-				contextSettings.MinorVersion,
-				(uint)contextSettings.AttributeFlags,
-				contextSettings.SRgbCapable);
-		}
-
-		internal struct Native
-		{
-			public uint DepthBits;
-			public uint StencilBits;
-			public uint AntialiasingLevel;
-			public uint MajorVersion;
-			public uint MinorVersion;
-			public uint AttributeFlags;
-			public bool SRgbCapable;
-
-			public Native(
-				uint depthBits,
-				uint stencilBits,
-				uint antialiasingLevel,
-				uint majorVersion,
-				uint minorVersion,
-				uint attributeFlags,
-				bool sRgbCapable)
-			{
-				DepthBits = depthBits;
-				StencilBits = stencilBits;
-				AntialiasingLevel = antialiasingLevel;
-				MajorVersion = majorVersion;
-				MinorVersion = minorVersion;
-				AttributeFlags = attributeFlags;
-				SRgbCapable = sRgbCapable;
-			}
-		}
 	};
 }
