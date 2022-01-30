@@ -43,7 +43,7 @@ namespace SFML.Window
 
 	public unsafe class Window : IDisposable
 	{
-		internal Native* Handle;
+		internal readonly Native* Handle;
 
 		#region Properties
 
@@ -70,14 +70,7 @@ namespace SFML.Window
 		///   In this case, SFML chose the closest match.
 		/// </remarks>
 		/// <value>Structure containing the OpenGL context settings.</value>
-		public ContextSettings Settings
-		{
-			get
-			{
-				ThrowIfNotCreated();
-				return sfWindow_getSettings(Handle);
-			}
-		}
+		public ContextSettings Settings => sfWindow_getSettings(Handle);
 
 		/// <summary>
 		///   Gets or sets the position of the window.
@@ -89,17 +82,9 @@ namespace SFML.Window
 		/// <value>Position of the window, in pixels.</value>
 		public Vector2<int> Position
 		{
-			get
-			{
-				ThrowIfNotCreated();
-				return sfWindow_getPosition(Handle);
-			}
+			get => sfWindow_getPosition(Handle);
 
-			set
-			{
-				ThrowIfNotCreated();
-				sfWindow_setPosition(Handle, value);
-			}
+			set => sfWindow_setPosition(Handle, value);
 		}
 
 		/// <summary>
@@ -111,29 +96,25 @@ namespace SFML.Window
 		/// <value>Size of the window, in pixels</value>
 		public Vector2<uint> Size
 		{
-			get
-			{
-				ThrowIfNotCreated();
-				return sfWindow_getSize(Handle);
-			}
+			get => sfWindow_getSize(Handle);
 
-			set
-			{
-				ThrowIfNotCreated();
-				sfWindow_setSize(Handle, value);
-			}
+			set => sfWindow_setSize(Handle, value);
 		}
 
 		/// <summary>
 		///   Sets the title of the window.
 		/// </summary>
 		/// <seealso cref="Icon" />
-		public string Title
+		public unsafe string Title
 		{
 			set
 			{
-				ThrowIfNotCreated();
-				sfWindow_setUnicodeTitle(Handle, UTF32Ptr.ToPointer(value));
+				byte[]? value_utf32 = UTF32Helper.GetBytes(value);
+
+				fixed (byte* value_ptr = value_utf32)
+				{
+					sfWindow_setUnicodeTitle(Handle, (uint*)value_ptr);
+				}
 			}
 		}
 
@@ -145,11 +126,7 @@ namespace SFML.Window
 		/// </remarks>
 		public bool Visible
 		{
-			set
-			{
-				ThrowIfNotCreated();
-				sfWindow_setVisible(Handle, value);
-			}
+			set => sfWindow_setVisible(Handle, value);
 		}
 
 		/// <summary>
@@ -164,11 +141,7 @@ namespace SFML.Window
 		/// </remarks>
 		public bool VerticalSyncEnabled
 		{
-			set
-			{
-				ThrowIfNotCreated();
-				sfWindow_setVerticalSyncEnabled(Handle, value);
-			}
+			set => sfWindow_setVerticalSyncEnabled(Handle, value);
 		}
 
 		/// <summary>
@@ -179,11 +152,7 @@ namespace SFML.Window
 		/// </remarks>
 		public bool MouseCursorVisible
 		{
-			set
-			{
-				ThrowIfNotCreated();
-				sfWindow_setMouseCursorVisible(Handle, value);
-			}
+			set => sfWindow_setMouseCursorVisible(Handle, value);
 		}
 
 		/// <summary>
@@ -196,11 +165,7 @@ namespace SFML.Window
 		/// </remarks>
 		public bool MouseCursorGrabbed
 		{
-			set
-			{
-				ThrowIfNotCreated();
-				sfWindow_setMouseCursorGrabbed(Handle, value);
-			}
+			set => sfWindow_setMouseCursorGrabbed(Handle, value);
 		}
 
 		/// <summary>
@@ -216,7 +181,6 @@ namespace SFML.Window
 		{
 			set
 			{
-				ThrowIfNotCreated();
 				sfWindow_setMouseCursor(Handle,
 					value is null ? throw new ArgumentNullException(nameof(value)) :
 					value.IsCreated is false ? throw new ArgumentException("Cursor is not created.", nameof(value)) :
@@ -234,11 +198,7 @@ namespace SFML.Window
 		/// </remarks>
 		public bool KeyRepeatEnabled
 		{
-			set
-			{
-				ThrowIfNotCreated();
-				sfWindow_setKeyRepeatEnabled(Handle, value);
-			}
+			set => sfWindow_setKeyRepeatEnabled(Handle, value);
 		}
 
 		/// <summary>
@@ -255,11 +215,7 @@ namespace SFML.Window
 		/// </remarks>
 		public uint FramerateLimit
 		{
-			set
-			{
-				ThrowIfNotCreated();
-				sfWindow_setFramerateLimit(Handle, value);
-			}
+			set => sfWindow_setFramerateLimit(Handle, value);
 		}
 
 		/// <summary>
@@ -272,11 +228,7 @@ namespace SFML.Window
 		/// </remarks>
 		public float JoystickThreshold
 		{
-			set
-			{
-				ThrowIfNotCreated();
-				sfWindow_setJoystickThreshold(Handle, value);
-			}
+			set => sfWindow_setJoystickThreshold(Handle, value);
 		}
 
 		#endregion
@@ -290,7 +242,12 @@ namespace SFML.Window
 		///   This constructor doesn't actually create the window,
 		///   use the other constructors or call <see cref="Create"/> to do so.
 		/// </remarks>
-		public Window() { }
+		//public Window() { }
+
+		private protected Window(Native* handle)
+		{
+			Handle = handle;
+		}
 
 		/// <summary>
 		///   Construct a new window.
@@ -315,12 +272,25 @@ namespace SFML.Window
 			string title,
 			WindowStyle style = WindowStyle.Default,
 			ContextSettings? settings = null)
+			: this(CreateUnicode(mode, title, style, settings))
+		{ }
+
+		private static Native* CreateUnicode(
+			VideoMode mode,
+			string title,
+			WindowStyle style,
+			ContextSettings? settings)
 		{
-			Create(
-				mode,
-				title,
-				style,
-				settings ?? ContextSettings.Default);
+			byte[]? title_utf32 = UTF32Helper.GetBytes(title);
+
+			fixed (byte* title_ptr = title_utf32)
+			{
+				return sfWindow_createUnicode(
+					mode,
+					(uint*)title_ptr,
+					style,
+					settings);
+			}
 		}
 
 		/// <summary>
@@ -339,108 +309,14 @@ namespace SFML.Window
 		public Window(
 			IntPtr handle,
 			ContextSettings? settings = null)
-		{
-			Create(
-				handle,
-				settings ?? ContextSettings.Default);
-		}
+			: this(CreateFromHandle(handle, settings))
+		{ }
 
-		/// <summary>
-		///   Create (or recreate) the window.
-		/// </summary>
-		/// <remarks>
-		///   If the window was already created, it closes it first.
-		///   <br>
-		///     If <paramref name="style" /> contains <see cref="WindowStyle.Fullscreen" />,
-		///     then <paramref name="mode" /> must be a valid video mode.
-		///   </br>
-		///   <para>
-		///     The <paramref name="settings" /> parameter is an optional structure
-		///     specifying advanced OpenGL context settings such as antialiasing, depth-buffer bits, etc.
-		///   </para>
-		/// </remarks>
-		/// <param name="mode">Video mode to use (defines the width, height and depth of the rendering area of the window).</param>
-		/// <param name="title">Title of the window.</param>
-		/// <param name="style">Window style, a bitwise OR combination of <see cref="WindowStyle" /> enumerators.</param>
-		/// <param name="settings">Additional settings for the underlying OpenGL context.</param>
-		public void Create(
-			VideoMode mode,
-			string title,
-			WindowStyle style = WindowStyle.Default,
-			ContextSettings? settings = null)
-		{
-			if (Handle is not null)
-			{
-				sfWindow_close(Handle);
-				sfWindow_destroy(Handle);
-				Handle = null;
-			}
-			OnCreate(mode, title, style, settings);
-		}
-
-		private protected virtual void OnCreate(
-			VideoMode mode,
-			string title,
-			WindowStyle style = WindowStyle.Default,
-			ContextSettings? settings = null)
-		{
-			ContextSettings.Native* settings_ptr = null;
-
-			if (settings is not null)
-			{
-				ContextSettings.Native settings_handle = ContextSettings.GetHandle(settings);
-				settings_ptr = &settings_handle;
-			}
-
-			Handle = sfWindow_createUnicode(
-				mode,
-				UTF32Ptr.ToPointer(title),
-				style,
-				settings_ptr);
-		}
-
-		/// <summary>
-		///   Create (or recreate) the window from an existing control.
-		/// </summary>
-		/// <remarks>
-		///   Use this function if you want to create an OpenGL rendering area
-		///   into an already existing control.
-		///   <br>
-		///     If the window was already created, it closes it first.
-		///   </br>
-		///   <para>
-		///     The second parameter is an optional structure specifying advanced OpenGL context settings
-		///     such as antialiasing, depth-buffer bits, etc.
-		///   </para>
-		/// </remarks>
-		/// <param name="handle">Platform-specific handle of the control.</param>
-		/// <param name="settings">Additional settings for the underlying OpenGL context.</param>
-		public void Create(
+		private static Native* CreateFromHandle(
 			IntPtr handle,
-			ContextSettings? settings = null)
+			ContextSettings? settings)
 		{
-			if (Handle is not null)
-			{
-				sfWindow_close(Handle);
-				sfWindow_destroy(Handle);
-				Handle = null;
-			}
-			OnCreate(handle, settings);
-		}
-
-		private protected virtual void OnCreate(
-			IntPtr handle,
-			ContextSettings? settings = null)
-		{
-			ContextSettings.Native* settings_ptr = null;
-
-			if (settings is not null)
-			{
-				ContextSettings.Native settings_handle = ContextSettings.GetHandle(settings);
-				settings_ptr = &settings_handle;
-			}
-
-			Handle = sfWindow_createFromHandle(handle, settings_ptr);
+			return sfWindow_createFromHandle(handle, settings);
 		}
 
 		#endregion
@@ -490,7 +366,6 @@ namespace SFML.Window
 		/// <seealso cref="WaitEvent(out Event)" />
 		public bool PollEvent(out Event @event)
 		{
-			ThrowIfNotCreated();
 			return sfWindow_pollEvent(Handle, out @event);
 		}
 
@@ -516,7 +391,6 @@ namespace SFML.Window
 		/// <seealso cref="PollEvent(out Event)" />
 		public bool WaitEvent(out Event @event)
 		{
-			ThrowIfNotCreated();
 			return sfWindow_waitEvent(Handle, out @event);
 		}
 
@@ -525,8 +399,6 @@ namespace SFML.Window
 		/// </summary>
 		internal void SetIcon(uint width, uint height, byte* pixels)
 		{
-			ThrowIfNotCreated();
-
 			Debug.Assert(pixels is not null);
 
 			sfWindow_setIcon(Handle,
@@ -574,7 +446,6 @@ namespace SFML.Window
 		/// </returns>
 		public bool SetActive(bool active)
 		{
-			ThrowIfNotCreated();
 			return sfWindow_setActive(Handle, active);
 		}
 
@@ -591,7 +462,6 @@ namespace SFML.Window
 		/// </remarks>
 		public void RequestFocus()
 		{
-			ThrowIfNotCreated();
 			sfWindow_requestFocus(Handle);
 		}
 
@@ -609,7 +479,6 @@ namespace SFML.Window
 		/// </returns>
 		public bool HasFocus()
 		{
-			ThrowIfNotCreated();
 			return sfWindow_hasFocus(Handle);
 		}
 
@@ -623,7 +492,6 @@ namespace SFML.Window
 		/// </remarks>
 		public void Display()
 		{
-			ThrowIfNotCreated();
 			sfWindow_display(Handle);
 		}
 
@@ -640,7 +508,6 @@ namespace SFML.Window
 		/// <returns>System handle of the window.</returns>
 		public IntPtr GetSystemHandle()
 		{
-			ThrowIfNotCreated();
 			return sfWindow_getSystemHandle(Handle);
 		}
 
@@ -693,12 +560,12 @@ namespace SFML.Window
 			VideoMode mode,
 			uint* title,
 			WindowStyle style,
-			ContextSettings.Native* settings);
+			ContextSettings? settings);
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
 		private static extern Native* sfWindow_createFromHandle(
 			IntPtr handle,
-			ContextSettings.Native* settings);
+			ContextSettings? settings);
 
 		[DllImport(csfml_window, CallingConvention = CallingConvention.Cdecl)]
 		private static extern void sfWindow_destroy(Native* window);

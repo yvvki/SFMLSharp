@@ -43,48 +43,51 @@ namespace SFML.Graphics
 
 		#region Constructors & Create Methods
 
-		public RenderWindow() : base() { }
+		private protected RenderWindow(Native* handle) : base(handle)
+		{
+			_defaultView = new(sfRenderWindow_getDefaultView(Handle));
+			_view = new(sfRenderWindow_getView(Handle));
+		}
 
 		public RenderWindow(
 			VideoMode mode,
 			string title,
 			WindowStyle style = WindowStyle.Default,
 			ContextSettings? settings = null)
-			: base(mode, title, style, settings) { }
+			: this(CreateUnicode(mode, title, style, settings))
+		{ }
+
+		private static Native* CreateUnicode(
+			VideoMode mode,
+			string title,
+			WindowStyle style,
+			ContextSettings? settings)
+		{
+			byte[]? title_utf32 = UTF32Helper.GetBytes(title);
+
+			fixed (byte* title_ptr = title_utf32)
+			{
+				return sfRenderWindow_createUnicode(
+					mode,
+					(uint*)title_ptr,
+					style,
+					settings);
+			}
+		}
 
 		public RenderWindow(
 			IntPtr handle,
 			ContextSettings? settings = null)
-			: base(handle, settings) { }
+			: this(CreateFromHandle(handle, settings))
+		{ }
 
-		private protected override void OnCreate(
-			VideoMode mode,
-			string title,
-			WindowStyle style,
-			ContextSettings? settings = null)
-		{
-			Handle = sfRenderWindow_createUnicode(
-				mode,
-				UTF32Ptr.ToPointer(title),
-				style,
-				settings ?? ContextSettings.Default);
-			Initialize();
-		}
-
-		private protected override void OnCreate(
+		private static Native* CreateFromHandle(
 			IntPtr handle,
-			ContextSettings? settings = null)
+			ContextSettings? settings)
 		{
-			Handle = sfRenderWindow_createFromHandle(
+			return sfRenderWindow_createFromHandle(
 				handle,
-				settings ?? ContextSettings.Default);
-			Initialize();
-		}
-
-		private void Initialize()
-		{
-			_defaultView = new(sfRenderWindow_getDefaultView(Handle));
-			_view = new(sfRenderWindow_getView(Handle));
+				settings);
 		}
 
 		#endregion
@@ -187,12 +190,12 @@ namespace SFML.Graphics
 			VideoMode mode,
 			uint* title,
 			WindowStyle style,
-			ContextSettings settings);
+			ContextSettings? settings);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern unsafe Native* sfRenderWindow_createFromHandle(
 			IntPtr handle,
-			ContextSettings settings);
+			ContextSettings? settings);
 
 		[DllImport(csfml_graphics, CallingConvention = CallingConvention.Cdecl)]
 		private static extern unsafe void sfRenderWindow_destroy(Native* window);

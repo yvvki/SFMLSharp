@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 
 using SFML.System;
 
@@ -69,8 +70,21 @@ namespace SFML.Graphics
 
 		public string? String
 		{
-			get => UTF32Ptr.GetString(sfText_getUnicodeString(Handle));
-			set => sfText_setUnicodeString(Handle, UTF32Ptr.ToPointer(value));
+			get
+			{
+				uint* value = sfText_getUnicodeString(Handle);
+				string? result = UTF32Helper.GetString(value);
+
+				return result;
+			}
+			set
+			{
+				byte[]? value_utf32 = UTF32Helper.GetBytes(value);
+				fixed (byte* value_ptr = value_utf32)
+				{
+					sfText_setUnicodeString(Handle, (uint*)value_ptr);
+				}
+			}
 		}
 
 		private Font? _font;

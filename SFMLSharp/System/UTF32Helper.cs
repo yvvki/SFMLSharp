@@ -1,18 +1,20 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace SFML.System
 {
 	/// <summary>
 	///   Utility struct to parse unsigned 32-bit interger pointer as string and back.
 	/// </summary>
-	internal static unsafe class UTF32Ptr
+	internal unsafe class UTF32Helper
 	{
 		public static int GetLength(uint* data)
 		{
 			if (data is null) return default;
 
 			uint* ptr = data;
-			while (*ptr is not default(uint))
+			while (*ptr is not 0)
 			{
 				ptr++;
 			}
@@ -23,15 +25,17 @@ namespace SFML.System
 		public static string? GetString(uint* data)
 		{
 			if (data is null) return default;
+
 			return Encoding.UTF32.GetString(
 				(byte*)data,
 				GetLength(data) * sizeof(uint));
 		}
 
-		public static uint* ToPointer(string? str)
+		public static byte[]? GetBytes(string? s)
 		{
-			if (str is null) return default;
-			fixed (byte* data = Encoding.UTF32.GetBytes(str)) return (uint*)data;
+			if (s is null) return default;
+
+			return Encoding.UTF32.GetBytes(s);
 		}
 	}
 }
